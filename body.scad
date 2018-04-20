@@ -3,18 +3,19 @@ tent = 15;
 left_x = 250;
 right_x = 350;
 y = 225;
-z = opp(tent,left_x);
+z = opp(tent,right_x);
 
 left();
 right();
 
-function leg(angle,l,hyp) = sqrt((hyp * hyp) - (l * l));
 function opp(angle,hyp) = hyp * sin(angle);
 
 module left() {
-  rotate(a=tent, v=[0,-1,0]) {
-    cube([left_x,y,20]);
-  }  
+  translate(v=[0,0,z-opp(tent,left_x)]) {
+    rotate(a=tent, v=[0,-1,0]) {
+      cube([left_x,y,20]);
+    }  
+  }
 }
 
 module right() {
