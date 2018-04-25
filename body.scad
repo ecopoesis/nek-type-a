@@ -3,14 +3,15 @@ include <bosl/quaternions.scad>
 
 tent = 15;
 split = 25;
+slope = 7.5;
 
 left_x = 200;
 right_x = 350;
 y = 225;
-top_z = 10;
+top_z = 50;
 
-left_quat = Q_Mul(Quat([0,-1,0],tent), Quat([0,0,-1],split/2));
-right_quat = Q_Mul(Quat([0,1,0],tent), Quat([0,0,1],split/2));
+left_quat = Q_Mul(Q_Mul(Quat([0,-1,0],tent), Quat([0,0,-1],split/2)), Quat([-1,0,0],slope));
+right_quat = Q_Mul(Q_Mul(Quat([0,1,0],tent), Quat([0,0,1],split/2)), Quat([-1,0,0],slope));
 
 // point where the two halves meet in the back
 left_pivot = Q_Rot_Vector([left_x/2,y/2,top_z/2], left_quat);
