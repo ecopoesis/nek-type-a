@@ -9,9 +9,10 @@ slope = 7.5;
 $fa=10; $fs=10;
 
 // from http://builder.swillkb.com/
-left_plate_x = 168.114;
-right_plate_x = 225.264;
-plate_y = 146.778; // for right, left is 144.302
+// 20 mm padding, 7.5 mm corners
+left_plate_x = 178.114;
+right_plate_x = 235.264;
+plate_y = 156.778; // for right, left is 154.302
 
 // how much to add to the plates to make the base
 extra_base = 15;
