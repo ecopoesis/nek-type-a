@@ -2,18 +2,30 @@ include <bosl/masks.scad>
 include <bosl/math.scad>
 include <bosl/quaternions.scad>
 
-tent = 15;
+tent = 17.5;
 split = 25;
 slope = 7.5;
 
 $fa=10; $fs=10;
 
-left_x = 200;
-right_x = 350;
-y = 225;
+// from http://builder.swillkb.com/
+left_plate_x = 200;
+right_plate_x = 225.264;
+plate_y = 146.778;
 
+// how much to add to the plates to make the base
+extra_base = 10;
+
+left_x = left_plate_x + (2 * extra_base);
+right_x = right_plate_x + (2 * extra_base);
+y = plate_y + (2 * extra_base);
+
+// dimensions for the slice that gets removed from the top
 overshoot = 50;
 over_z = 150;
+
+// how deep it the keyboard well
+well_z = 35;
 
 radius = 0;
 
@@ -41,12 +53,14 @@ function left_fout(h) = Q_Rot_Vector([-left_x/2,-y/2,h/2], left_quat);
 function right_fout(h) = Q_Rot_Vector([right_x/2,-y/2,h/2], right_quat);
 
 // total height is the height at the wide part of the gap
-z = left_gap(1)[2]-left_pivot(h)[2]-right_fout(h)[2]+right_pivot(h)[2];
+z = right_gap(1)[2]-right_fout(1)[2];
 
-left_footprint(1);
+//left_footprint(1);
+//right_footprint(1);
 
 left();
 right();
+
 
 module left() {
   difference() {
@@ -72,6 +86,16 @@ module right() {
       Qrot(right_quat) {
         cube([right_x+overshoot,y+overshoot,over_z], center=true);
       }
+    }
+    translate(v=[
+              -right_pivot(well_z)[0],
+              -right_gap(well_z)[1],
+              -right_fout(well_z-1)[2]]) {
+      Qrot(right_quat) {
+        translate(v=[-right_plate_x/2,-plate_y/2,0]) {
+          linear_extrude(height=well_z, center=true) import("right_bottom.dxf");  
+        }
+      }    
     }
   } 
 }
