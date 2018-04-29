@@ -55,7 +55,7 @@ function right_npivot(h) = right_pivot(-h);
 
 // corners at wide part of gap
 function left_gap(h,w=0) = Q_Rot_Vector([left_x/2,-y/2+w/2,h/2], left_quat);
-function right_gap(h,w=0) = Q_Rot_Vector([-right_x/2,-y/2+w/2,h/2], right_quat);
+function right_gap(h,w=0) = Q_Rot_Vector([-right_x/2,(-y/2)+(w/2),h/2], right_quat);
 
 // the point "below" the gap
 function left_ngap(h) = left_gap(-h);
@@ -73,10 +73,46 @@ z=right_gap(1,-wrist)[2]-right_fout(1,wrist)[2]+well_z+extra_z;
 
 left();
 right();
+#center();
 //brains();
 
 module brains() {
   translate(v=[0,feather[1]/2,0]) rotate([0,0,180]) import("adafruit_feather.stl");
+}
+
+pivot_y = right_pivot(1)[1]-right_gap(1)[1];
+pivot_z = right_pivot(1)[2]-right_fout(1)[2] + extra_z + well_z;
+gap_x = -right_npivot(over_z)[0];
+gap_y = -right_ngap(over_z)[1];
+gap_z = right_pivot(over_z)[2]+well_z+extra_z;
+
+echo(pivot_y=pivot_y);
+echo(pivot_z=pivot_z);
+echo(gap_x=gap_x);
+echo(gap_y=gap_y);
+echo(gap_z=gap_z);
+
+module center() {
+  polyhedron(
+    points=[
+      [0,pivot_y,pivot_z],  // 0 - top pivot 
+      [0,pivot_y,0],    // 1 - bottom pivot
+      [-gap_x,gap_y,gap_z], // 2 - top left gap
+      [gap_x,gap_y,gap_z],  // 3 - top right gap
+      [-gap_x,gap_y,0],   // 4 - bottom left gap
+      [gap_x,gap_y,0]     // 5 - bottom right gap
+    ],
+    faces=[
+      [0,1,2],
+      [1,2,4],
+      [0,1,3],
+      [1,3,5],
+      [1,4,5],
+      [0,2,3],
+      [2,3,4],
+      [3,4,5]
+    ]
+  );
 }
 
 module left() {
