@@ -46,7 +46,7 @@ left_quat = Q_Mul(Q_Mul(Quat([0,-1,0],tent), Quat([0,0,-1],split/2)), Quat([-1,0
 right_quat = Q_Mul(Q_Mul(Quat([0,1,0],tent), Quat([0,0,1],split/2)), Quat([-1,0,0],slope));
 
 // point where the two halves meet in the back at the top
-function left_pivot(h) = Q_Rot_Vector([left_x/2,y/2,h/2], left_quat);
+function left_pivot(h,w=0) = Q_Rot_Vector([left_x/2,y/2+w/2,h/2], left_quat);
 function right_pivot(h,w=0) = Q_Rot_Vector([-right_x/2,y/2+w/2,h/2], right_quat);
 
 // the point "below" the pivot
@@ -54,7 +54,7 @@ function left_npivot(h) = left_pivot(-h);
 function right_npivot(h) = right_pivot(-h);
 
 // corners at wide part of gap
-function left_gap(h) = Q_Rot_Vector([left_x/2,-y/2,h/2], left_quat);
+function left_gap(h,w=0) = Q_Rot_Vector([left_x/2,-y/2+w/2,h/2], left_quat);
 function right_gap(h,w=0) = Q_Rot_Vector([-right_x/2,-y/2+w/2,h/2], right_quat);
 
 // the point "below" the gap
@@ -66,8 +66,7 @@ function left_fout(h) = Q_Rot_Vector([-left_x/2,-y/2,h/2], left_quat);
 function right_fout(h,w=0) = Q_Rot_Vector([right_x/2,-y/2+w/2,h/2], right_quat);
 
 // total height is the height at the wide part of the gap
-z=right_gap(1)[2]-right_fout(1,wrist)[2]+well_z+extra_z;
-echo(z=right_fout(1,wrist));
+z=right_gap(1,-wrist)[2]-right_fout(1,wrist)[2]+well_z+extra_z;
 
 //left_footprint(1);
 //right_footprint(1);
@@ -136,11 +135,11 @@ module right() {
 
 module left_footprint(h) {
   translate(v=[
-            -left_pivot(h)[0],
-            -left_gap(h)[1],
-            -left_pivot(h)[2]-right_fout(h)[2]+right_pivot(h)[2]]) {
+            -left_pivot(h,wrist)[0],
+            -left_gap(h,wrist)[1],
+            -left_pivot(h,wrist)[2]-right_fout(h,wrist)[2]+right_pivot(h,wrist)[2]]) {
     Qrot(left_quat) {
-      cube([left_x,y,h], center=true);  
+      cube([left_x,y+wrist,h], center=true);  
     }
   }
 }
@@ -151,7 +150,7 @@ module right_footprint(h) {
             -right_gap(h,wrist)[1],
             -right_fout(h,wrist)[2]]) {
     Qrot(right_quat){
-      cube([right_x,y+wrist,1], center=true);
+      cube([right_x,y+wrist,h], center=true);
     }
   }
 }
