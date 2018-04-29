@@ -2,6 +2,8 @@ include <bosl/masks.scad>
 include <bosl/math.scad>
 include <bosl/quaternions.scad>
 
+// taps should be >= M6
+
 tent = 17.5;
 split = 25;
 slope = 7.5;
@@ -26,7 +28,8 @@ overshoot = 50;
 over_z = 150;
 
 // how deep it the keyboard well
-well_z = 30;
+// should be < 3x plate corners
+well_z = 20; 
 
 // extra z to make there not be holes in the bottom
 extra_z = 5;
