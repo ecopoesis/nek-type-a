@@ -24,7 +24,7 @@ right_x = right_plate_x + (2 * extra_base);
 y = plate_y + (2 * extra_base);
 
 // dimensions for the slice that gets removed from the top
-overshoot = 50;
+overshoot = 1000;
 over_z = 150;
 
 // how deep it the keyboard well
@@ -34,14 +34,20 @@ well_z = 20;
 // extra z to make there not be holes in the bottom
 extra_z = 5;
 
+// wrist rest depth (y-ish)
+wrist = 100;
+
 radius = 0;
+
+// feather size
+feather = [22.86,50.8,0];
 
 left_quat = Q_Mul(Q_Mul(Quat([0,-1,0],tent), Quat([0,0,-1],split/2)), Quat([-1,0,0],slope));
 right_quat = Q_Mul(Q_Mul(Quat([0,1,0],tent), Quat([0,0,1],split/2)), Quat([-1,0,0],slope));
 
 // point where the two halves meet in the back at the top
 function left_pivot(h) = Q_Rot_Vector([left_x/2,y/2,h/2], left_quat);
-function right_pivot(h) = Q_Rot_Vector([-right_x/2,y/2,h/2], right_quat);
+function right_pivot(h,w=0) = Q_Rot_Vector([-right_x/2,y/2+w/2,h/2], right_quat);
 
 // the point "below" the pivot
 function left_npivot(h) = left_pivot(-h);
@@ -49,7 +55,7 @@ function right_npivot(h) = right_pivot(-h);
 
 // corners at wide part of gap
 function left_gap(h) = Q_Rot_Vector([left_x/2,-y/2,h/2], left_quat);
-function right_gap(h) = Q_Rot_Vector([-right_x/2,-y/2,h/2], right_quat);
+function right_gap(h,w=0) = Q_Rot_Vector([-right_x/2,-y/2+w/2,h/2], right_quat);
 
 // the point "below" the gap
 function left_ngap(h) = left_gap(-h);
@@ -57,16 +63,22 @@ function right_ngap(h) = right_gap(-h);
 
 // front outside corners
 function left_fout(h) = Q_Rot_Vector([-left_x/2,-y/2,h/2], left_quat);
-function right_fout(h) = Q_Rot_Vector([right_x/2,-y/2,h/2], right_quat);
+function right_fout(h,w=0) = Q_Rot_Vector([right_x/2,-y/2+w/2,h/2], right_quat);
 
 // total height is the height at the wide part of the gap
-z = right_gap(1)[2]-right_fout(1)[2]+well_z+extra_z;
+z=right_gap(1)[2]-right_fout(1,wrist)[2]+well_z+extra_z;
+echo(z=right_fout(1,wrist));
 
 //left_footprint(1);
 //right_footprint(1);
 
 left();
 right();
+//brains();
+
+module brains() {
+  translate(v=[0,feather[1]/2,0]) rotate([0,0,180]) import("adafruit_feather.stl");
+}
 
 module left() {
   difference() {
@@ -105,7 +117,7 @@ module right() {
               -right_ngap(over_z)[1],
               right_pivot(over_z)[2]+well_z+extra_z]) {
       Qrot(right_quat) {
-        cube([right_x+overshoot,y+overshoot,over_z], center=true);
+        cube([right_x+overshoot,y+overshoot+wrist,over_z], center=true);
       }
     }
     // keyboard well
@@ -135,11 +147,11 @@ module left_footprint(h) {
 
 module right_footprint(h) {
   translate(v=[
-            -right_pivot(h)[0],
-            -right_gap(h)[1],
-            -right_fout(h)[2]]) {
+            -right_pivot(h,wrist)[0],
+            -right_gap(h,wrist)[1],
+            -right_fout(h,wrist)[2]]) {
     Qrot(right_quat){
-      cube([right_x,y,1], center=true);
+      cube([right_x,y+wrist,1], center=true);
     }
   }
 }
