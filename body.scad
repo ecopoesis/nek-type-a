@@ -9,9 +9,9 @@ slope = 7.5;
 $fa=10; $fs=10;
 
 // from http://builder.swillkb.com/
-left_plate_x = 200;
+left_plate_x = 168.114;
 right_plate_x = 225.264;
-plate_y = 146.778;
+plate_y = 146.778; // for right, left is 144.302
 
 // how much to add to the plates to make the base
 extra_base = 15;
@@ -75,6 +75,17 @@ module left() {
               -left_pivot(-over_z)[2]-right_fout(over_z)[2]+right_pivot(over_z)[2]+well_z+extra_z]) {
       Qrot(left_quat) {
         cube([left_x+overshoot,y+overshoot,over_z], center=true);  
+      }
+    }
+    // keyboard well
+    translate(v=[
+              -left_pivot(well_z)[0],
+              -left_gap(well_z)[1],
+              -left_pivot(well_z-1)[2]-right_fout(well_z-1)[2]+right_pivot(well_z-1)[2]+well_z+extra_z]) {
+      Qrot(left_quat) {
+        translate(v=[-left_plate_x/2,-plate_y/2,0]) {
+          linear_extrude(height=well_z, center=true) import("left_bottom.dxf");  
+        }
       }
     }
   }
