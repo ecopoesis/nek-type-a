@@ -69,11 +69,11 @@ function right_fout(h,w=0) = Q_Rot_Vector([right_x/2,-y/2+w/2,h/2], right_quat);
 z=right_gap(1,-wrist)[2]-right_fout(1,wrist)[2]+well_z+extra_z;
 
 //left_footprint(1);
-//right_footprint(1);
+right_footprint(1);
 
 left();
-right();
-#center();
+#right();
+center();
 //brains();
 
 module brains() {
@@ -81,10 +81,10 @@ module brains() {
 }
 
 pivot_y = right_pivot(1)[1]-right_gap(1)[1];
-pivot_z = right_pivot(1)[2]-right_fout(1)[2] + extra_z + well_z;
-gap_x = -right_npivot(over_z)[0];
-gap_y = -right_ngap(over_z)[1];
-gap_z = right_pivot(over_z)[2]+well_z+extra_z;
+pivot_z = right_pivot(1)[2]-right_fout(1)[2]+well_z+extra_z;
+gap_x = (right_pivot(1)[0]-right_gap(1)[0]);
+gap_y = Q_Rot_Vector([-right_x/2,(-y-wrist)/2,1/2], right_quat)[1]-right_gap(1,wrist)[1];
+gap_z = z;
 
 echo(pivot_y=pivot_y);
 echo(pivot_z=pivot_z);
