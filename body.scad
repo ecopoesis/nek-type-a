@@ -14,7 +14,7 @@ right_plate_x = 225.264;
 plate_y = 146.778;
 
 // how much to add to the plates to make the base
-extra_base = 10;
+extra_base = 15;
 
 left_x = left_plate_x + (2 * extra_base);
 right_x = right_plate_x + (2 * extra_base);
@@ -25,7 +25,10 @@ overshoot = 50;
 over_z = 150;
 
 // how deep it the keyboard well
-well_z = 35;
+well_z = 30;
+
+// extra z to make there not be holes in the bottom
+extra_z = 5;
 
 radius = 0;
 
@@ -53,7 +56,7 @@ function left_fout(h) = Q_Rot_Vector([-left_x/2,-y/2,h/2], left_quat);
 function right_fout(h) = Q_Rot_Vector([right_x/2,-y/2,h/2], right_quat);
 
 // total height is the height at the wide part of the gap
-z = right_gap(1)[2]-right_fout(1)[2];
+z = right_gap(1)[2]-right_fout(1)[2]+well_z+extra_z;
 
 //left_footprint(1);
 //right_footprint(1);
@@ -61,14 +64,15 @@ z = right_gap(1)[2]-right_fout(1)[2];
 left();
 right();
 
-
 module left() {
   difference() {
+    // footprint shadow projected up
     linear_extrude(height=z) projection(cut=false) left_footprint(h=1);
+    // slice choppped off top to make wedge
     translate(v=[
               -left_npivot(over_z)[0],
               -left_ngap(over_z)[1],
-              -left_pivot(-over_z)[2]-right_fout(over_z)[2]+right_pivot(over_z)[2]]) {
+              -left_pivot(-over_z)[2]-right_fout(over_z)[2]+right_pivot(over_z)[2]+well_z+extra_z]) {
       Qrot(left_quat) {
         cube([left_x+overshoot,y+overshoot,over_z], center=true);  
       }
@@ -78,19 +82,22 @@ module left() {
 
 module right() {
   difference() {
+    // footprint shadow projected up
     linear_extrude(height=z) projection(cut=false) right_footprint(h=1); 
+    // slice choppped off top to make wedge
     translate(v=[
               -right_npivot(over_z)[0],
               -right_ngap(over_z)[1],
-              right_pivot(over_z)[2]]) {
+              right_pivot(over_z)[2]+well_z+extra_z]) {
       Qrot(right_quat) {
         cube([right_x+overshoot,y+overshoot,over_z], center=true);
       }
     }
+    // keyboard well
     translate(v=[
               -right_pivot(well_z)[0],
               -right_gap(well_z)[1],
-              -right_fout(well_z-1)[2]]) {
+              -right_fout(well_z-1)[2]+well_z+extra_z]) {
       Qrot(right_quat) {
         translate(v=[-right_plate_x/2,-plate_y/2,0]) {
           linear_extrude(height=well_z, center=true) import("right_bottom.dxf");  
