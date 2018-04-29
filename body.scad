@@ -69,10 +69,10 @@ function right_fout(h,w=0) = Q_Rot_Vector([right_x/2,-y/2+w/2,h/2], right_quat);
 z=right_gap(1,-wrist)[2]-right_fout(1,wrist)[2]+well_z+extra_z;
 
 //left_footprint(1);
-right_footprint(1);
+//right_footprint(1);
 
 left();
-#right();
+right();
 center();
 //brains();
 
@@ -82,7 +82,7 @@ module brains() {
 
 pivot_y = right_pivot(1)[1]-right_gap(1)[1];
 pivot_z = right_pivot(1)[2]-right_fout(1)[2]+well_z+extra_z;
-gap_x = (right_pivot(1)[0]-right_gap(1)[0]);
+gap_x = Q_Rot_Vector([-right_x/2,(-y-wrist)/2,1/2], right_quat)[0]-right_pivot(1,wrist)[0];//70;
 gap_y = Q_Rot_Vector([-right_x/2,(-y-wrist)/2,1/2], right_quat)[1]-right_gap(1,wrist)[1];
 gap_z = z;
 
@@ -96,11 +96,11 @@ module center() {
   polyhedron(
     points=[
       [0,pivot_y,pivot_z],  // 0 - top pivot 
-      [0,pivot_y,0],    // 1 - bottom pivot
+      [0,pivot_y,0],        // 1 - bottom pivot
       [-gap_x,gap_y,gap_z], // 2 - top left gap
       [gap_x,gap_y,gap_z],  // 3 - top right gap
-      [-gap_x,gap_y,0],   // 4 - bottom left gap
-      [gap_x,gap_y,0]     // 5 - bottom right gap
+      [-gap_x,gap_y,0],     // 4 - bottom left gap
+      [gap_x,gap_y,0]       // 5 - bottom right gap
     ],
     faces=[
       [0,1,2],
