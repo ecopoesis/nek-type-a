@@ -196,10 +196,15 @@ module right_fillet() {
   translate(v=[
             -right_pivot(1,wrist)[0],
             -right_gap(1,wrist)[1],
-            -right_fout(1,wrist)[2]+well_z+extra_z+.5]) {
+            -right_fout(1,wrist)[2]+well_z+extra_z]) {
     Qrot(right_quat){
-      translate([right_x/2+.5,0,0]) yrot(-tent) zrot(90) yrot(90) 
+      // right edge
+      translate([(right_x/2),0,.5]) yrot(-tent) zrot(90) yrot(90) 
       fillet_angled_edge_mask(h=y+wrist+overshoot, r=radius, ang=90+tent);
+    
+      // top edge
+      translate([0,((y+wrist)/2)+.5,.5]) yrot(90)
+      fillet_angled_edge_mask(h=right_x+overshoot, r=radius, ang=90+slope);
     }
   }
 }
