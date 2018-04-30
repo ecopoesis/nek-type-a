@@ -8,7 +8,7 @@ tent = 17.5;
 split = 25;
 slope = 7.5;
 
-$fa=10; $fs=10;
+$fa=1; $fs=1;
 
 // from http://builder.swillkb.com/
 // 20 mm padding, 7.5 mm corners
@@ -24,7 +24,7 @@ right_x = right_plate_x + (2 * extra_base);
 y = plate_y + (2 * extra_base);
 
 // dimensions for the slice that gets removed from the top
-overshoot = 1000;
+overshoot = 300;
 over_z = 150;
 
 // how deep it the keyboard well
@@ -37,7 +37,7 @@ extra_z = 5;
 // wrist rest depth (y-ish)
 wrist = 100;
 
-radius = 0;
+radius = 7.5;
 
 // feather size
 feather = [22.86,50.8,0];
@@ -70,6 +70,7 @@ z=right_gap(1,-wrist)[2]-right_fout(1,wrist)[2]+well_z+extra_z;
 
 //left_footprint(1);
 //right_footprint(1);
+//right_fillet(1);
 
 union() {
   center();
@@ -165,6 +166,7 @@ module right() {
         }
       }    
     }
+    right_fillet();
   } 
 }
 
@@ -186,6 +188,18 @@ module right_footprint(h) {
             -right_fout(h,wrist)[2]]) {
     Qrot(right_quat){
       cube([right_x,y+wrist,h], center=true);
+    }
+  }
+}
+
+module right_fillet() {
+  translate(v=[
+            -right_pivot(1,wrist)[0],
+            -right_gap(1,wrist)[1],
+            -right_fout(1,wrist)[2]+well_z+extra_z+.5]) {
+    Qrot(right_quat){
+      translate([right_x/2+.5,0,0]) yrot(-tent) zrot(90) yrot(90) 
+      fillet_angled_edge_mask(h=y+wrist+overshoot, r=radius, ang=90+tent);
     }
   }
 }
