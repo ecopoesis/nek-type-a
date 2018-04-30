@@ -71,10 +71,12 @@ z=right_gap(1,-wrist)[2]-right_fout(1,wrist)[2]+well_z+extra_z;
 //left_footprint(1);
 //right_footprint(1);
 
-left();
-right();
-center();
-//brains();
+union() {
+  center();
+  left();
+  right();
+  //brains();
+}
 
 module brains() {
   translate(v=[0,feather[1]/2,0]) rotate([0,0,180]) import("adafruit_feather.stl");
@@ -82,7 +84,7 @@ module brains() {
 
 pivot_y = right_pivot(1)[1]-right_gap(1)[1];
 pivot_z = right_pivot(1)[2]-right_fout(1)[2]+well_z+extra_z;
-gap_x = Q_Rot_Vector([-right_x/2,(-y-wrist)/2,1/2], right_quat)[0]-right_pivot(1,wrist)[0];//70;
+gap_x = Q_Rot_Vector([-right_x/2,(-y-wrist)/2,1/2], right_quat)[0]-right_pivot(1,wrist)[0];
 gap_y = Q_Rot_Vector([-right_x/2,(-y-wrist)/2,1/2], right_quat)[1]-right_gap(1,wrist)[1];
 gap_z = z;
 
@@ -103,14 +105,11 @@ module center() {
       [gap_x,gap_y,0]       // 5 - bottom right gap
     ],
     faces=[
-      [0,1,2],
-      [1,2,4],
-      [0,1,3],
-      [1,3,5],
-      [1,4,5],
-      [0,2,3],
-      [2,3,4],
-      [3,4,5]
+      [0,3,2],
+      [1,5,4],
+      [0,2,4,1],
+      [3,0,1,5],
+      [2,3,5,4,2]
     ]
   );
 }
