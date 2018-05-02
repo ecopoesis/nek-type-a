@@ -93,6 +93,9 @@ gap_x = Q_Rot_Vector([-right_x/2,(-y-wrist)/2,1/2], right_quat)[0]-right_pivot(1
 gap_y = Q_Rot_Vector([-right_x/2,(-y-wrist)/2,1/2], right_quat)[1]-right_gap(1,wrist)[1];
 gap_z = z;
 
+true_split = 90-(vector2d_angle([0,pivot_y],[gap_x,gap_y])/2);
+echo(true_split=true_split);
+
 echo(pivot_y=pivot_y);
 echo(pivot_z=pivot_z);
 echo(gap_x=gap_x);
@@ -223,7 +226,7 @@ module left_fillet() {
             -left_pivot(1,wrist)[2]-right_fout(1,wrist)[2]+right_pivot(1,wrist)[2]+well_z+extra_z]) {
     Qrot(left_quat){
       // left edge
-      translate([(-left_x/2),0,.5]) yrot(tent) zrot(90) yrot(90) 
+      translate([-left_x/2,0,.5]) yrot(tent) zrot(90) yrot(90) 
       fillet_angled_edge_mask(h=y+wrist, r=radius, ang=90+tent);
 
       // top edge
@@ -233,6 +236,17 @@ module left_fillet() {
       // bottom edge
       translate([0,-(y+wrist)/2,.5]) yrot(90)
       fillet_angled_edge_mask(h=left_x, r=radius, ang=90+slope);
-    }      
+            
+      // left front corner
+      //translate([-left_x/2,-(y+wrist)/2,.5]) zrot(90)
+      //fillet_angled_corner_mask(fillet=radius, ang=90+slope);
+    }   
+   
   }
+  // front corner
+  translate(v=[
+             Q_Rot_Vector([-left_x/2,(-y-wrist)/2,.5], left_quat)[0]-left_pivot(1,wrist)[0]-.5,
+             Q_Rot_Vector([-left_x/2,(-y-wrist)/2,.5], left_quat)[1]-left_gap(1,wrist)[1]+.5,
+             -left_pivot(1,wrist)[2]-right_fout(1,wrist)[2]+right_pivot(1,wrist)[2]]) 
+  zrot(-true_split) fillet_mask_z(l=z, r=radius);
 }
