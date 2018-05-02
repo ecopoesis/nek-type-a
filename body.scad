@@ -80,6 +80,7 @@ difference() {
     //brains();
   }
   right_fillet();
+  left_fillet();
 }
 
 module brains() {
@@ -212,5 +213,18 @@ module right_fillet() {
       translate([0,-(y+wrist)/2,.5]) yrot(90)
       fillet_angled_edge_mask(h=right_x, r=radius, ang=90+slope);
     }
+  }
+}
+
+module left_fillet() {
+  translate(v=[
+            -left_pivot(1,wrist)[0],
+            -left_gap(1,wrist)[1],
+            -left_pivot(1,wrist)[2]-right_fout(1,wrist)[2]+right_pivot(1,wrist)[2]+well_z+extra_z]) {
+    Qrot(left_quat){
+     // left edge
+     translate([(-left_x/2),0,.5]) yrot(tent) zrot(90) yrot(90) 
+     fillet_angled_edge_mask(h=y+wrist+500, r=radius, ang=90+tent);
+    }  
   }
 }
