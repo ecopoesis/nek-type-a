@@ -221,6 +221,20 @@ module right_fillet() {
       fillet_angled_edge_mask(h=right_x, r=radius, ang=90+slope);
     }
   }
+  
+  // front corner
+  translate(v=[
+             Q_Rot_Vector([right_x/2,(-y-wrist)/2,.5], right_quat)[0]-right_pivot(1,wrist)[0],
+             Q_Rot_Vector([right_x/2,(-y-wrist)/2,.5], right_quat)[1]-right_gap(1,wrist)[1],
+             -right_fout(1,wrist)[2]]) 
+  zrot(true_split) fillet_mask_z(l=z, r=radius);
+  
+  // back corner
+  translate(v=[
+             Q_Rot_Vector([right_x/2,(y+wrist)/2,.5], right_quat)[0]-right_pivot(1,wrist)[0],
+             Q_Rot_Vector([right_x/2,(y+wrist)/2,.5], right_quat)[1]-right_gap(1,wrist)[1],
+             -right_fout(1,wrist)[2]]) 
+  zrot(true_split) fillet_mask_z(l=z, r=radius); 
 }
 
 module left_fillet() {
@@ -247,6 +261,7 @@ module left_fillet() {
     }   
    
   }
+  
   // front corner
   translate(v=[
              Q_Rot_Vector([-left_x/2,(-y-wrist)/2,.5], left_quat)[0]-left_pivot(1,wrist)[0],
