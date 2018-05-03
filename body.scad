@@ -68,7 +68,8 @@ function right_fout(h,w=0) = Q_Rot_Vector([right_x/2,-y/2+w/2,h/2], right_quat);
 // total height is the height at the wide part of the gap
 z=right_gap(1,-wrist)[2]-right_fout(1,wrist)[2]+well_z+extra_z;
 
-//left_footprint(1);
+//projection(cut=false) left_footprint(1);
+//left_fillet(1);
 //right_footprint(1);
 //right_fillet(1);
 
@@ -93,7 +94,10 @@ gap_x = Q_Rot_Vector([-right_x/2,(-y-wrist)/2,1/2], right_quat)[0]-right_pivot(1
 gap_y = Q_Rot_Vector([-right_x/2,(-y-wrist)/2,1/2], right_quat)[1]-right_gap(1,wrist)[1];
 gap_z = z;
 
-true_split = 90-(vector2d_angle([0,pivot_y],[gap_x,gap_y])/2);
+function angle(p1, p2, fixed) = atan2(p1[1] - fixed[1], p1[0] - fixed[0]) - atan2(p2[1] - fixed[1], p2[0] - fixed[0]);
+
+true_split = angle([gap_x,gap_y],[0,gap_y],[0,pivot_y]);
+
 echo(true_split=true_split);
 
 echo(pivot_y=pivot_y);
@@ -245,8 +249,8 @@ module left_fillet() {
   }
   // front corner
   translate(v=[
-             Q_Rot_Vector([-left_x/2,(-y-wrist)/2,0], left_quat)[0]-left_pivot(1,wrist)[0]-.5,
-             Q_Rot_Vector([-left_x/2,(-y-wrist)/2,0], left_quat)[1]-left_gap(1,wrist)[1]+.7,
+             Q_Rot_Vector([-left_x/2,(-y-wrist)/2,.5], left_quat)[0]-left_pivot(1,wrist)[0],
+             Q_Rot_Vector([-left_x/2,(-y-wrist)/2,.5], left_quat)[1]-left_gap(1,wrist)[1],
              -left_pivot(1,wrist)[2]-right_fout(1,wrist)[2]+right_pivot(1,wrist)[2]]) 
   zrot(-true_split) fillet_mask_z(l=z, r=radius);
 }
