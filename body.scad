@@ -253,4 +253,11 @@ module left_fillet() {
              Q_Rot_Vector([-left_x/2,(-y-wrist)/2,.5], left_quat)[1]-left_gap(1,wrist)[1],
              -left_pivot(1,wrist)[2]-right_fout(1,wrist)[2]+right_pivot(1,wrist)[2]]) 
   zrot(-true_split) fillet_mask_z(l=z, r=radius);
+  
+  // back corner
+  translate(v=[
+             Q_Rot_Vector([-left_x/2,(y+wrist)/2,.5], left_quat)[0]-left_pivot(1,wrist)[0],
+             Q_Rot_Vector([-left_x/2,(y+wrist)/2,.5], left_quat)[1]-left_gap(1,wrist)[1],
+             -left_pivot(1,wrist)[2]-right_fout(1,wrist)[2]+right_pivot(1,wrist)[2]]) 
+  zrot(-true_split) fillet_mask_z(l=z, r=radius); 
 }
