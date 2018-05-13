@@ -1,6 +1,8 @@
 include <bosl/masks.scad>
 include <bosl/math.scad>
 include <bosl/quaternions.scad>
+include <bosl/shapes.scad>
+include <bosl/transforms.scad>
 
 // taps should be >= M6
 
@@ -37,7 +39,8 @@ extra_z = 5;
 // wrist rest depth (y-ish)
 wrist = 100;
 
-radius = 7.5;
+fillet_r = 7.5;
+big_corner = 55;
 
 // feather size
 feather = [22.86,50.8,0];
@@ -68,7 +71,9 @@ function right_fout(h,w=0) = Q_Rot_Vector([right_x/2,-y/2+w/2,h/2], right_quat);
 // total height is the height at the wide part of the gap
 z=right_gap(1,-wrist)[2]-right_fout(1,wrist)[2]+well_z+extra_z;
 
-//projection(cut=false) left_footprint(1);
+//projection(cut=false) left_footprint_old(1);
+//#projection(cut=false) left_footprint();
+
 //left_fillet(1);
 //right_footprint(1);
 //right_fillet(1);
@@ -76,8 +81,8 @@ z=right_gap(1,-wrist)[2]-right_fout(1,wrist)[2]+well_z+extra_z;
 difference() {
   union() {
     center();
-    left();
-    right();
+    left_side();
+    right_side();
     //brains();
   }
 }
@@ -124,24 +129,30 @@ module center() {
   );
 }
 
-module left() {
+module left_side() {
   difference() {
-    // footprint shadow projected up
-    linear_extrude(height=z) projection(cut=false) left_footprint(h=1);
-    // slice choppped off top to make wedge
-    translate(v=[
-              -left_npivot(over_z)[0],
-              -left_ngap(over_z)[1],
-              -left_pivot(-over_z)[2]-right_fout(over_z)[2]+right_pivot(over_z)[2]+well_z+extra_z]) {
-      Qrot(left_quat) {
-        cube([left_x+overshoot,y+overshoot,over_z], center=true);  
+    hull() {
+      difference() {
+        // footprint shadow projected up
+        linear_extrude(height=z) projection(cut=false) left_footprint();
+        // slice choppped off top to make wedge
+        translate(v=[
+                  -left_npivot(over_z)[0],
+                  -left_ngap(over_z)[1],
+                  -left_pivot(-over_z)[2]-right_fout(over_z)[2]+right_pivot(over_z)[2]+well_z+extra_z]) {
+          Qrot(left_quat) {
+            cube([left_x+overshoot,y+overshoot,over_z], center=true);  
+          }
+        }
       }
+      // fillet top
+      translate([0,0,well_z+extra_z]) left_footprint();
     }
     // keyboard well
     translate(v=[
               -left_pivot(well_z)[0],
               -left_gap(well_z)[1],
-              -left_pivot(well_z-1)[2]-right_fout(well_z-1)[2]+right_pivot(well_z-1)[2]+well_z+extra_z]) {
+              -left_pivot(well_z-1)[2]-right_fout(well_z-1)[2]+right_pivot(well_z-1)[2]+well_z+extra_z+fillet_r]) {
       Qrot(left_quat) {
         translate(v=[-left_plate_x/2,-plate_y/2,0]) {
           linear_extrude(height=well_z, center=true) import("left_bottom.dxf");  
@@ -151,7 +162,7 @@ module left() {
   }
 }
 
-module right() {
+module right_side() {
   difference() {
     // footprint shadow projected up
     linear_extrude(height=z) projection(cut=false) right_footprint(h=1); 
@@ -178,7 +189,7 @@ module right() {
   } 
 }
 
-module left_footprint(h) {
+module left_footprint_old(h) {
   translate(v=[
             -left_pivot(h,wrist)[0],
             -left_gap(h,wrist)[1],
@@ -186,6 +197,20 @@ module left_footprint(h) {
     Qrot(left_quat) {
       cube([left_x,y+wrist,h], center=true);  
     }
+  }
+}
+
+module left_footprint() {
+  translate(v=[
+            -left_pivot(fillet_r*2,wrist)[0],
+            -left_gap(fillet_r*2,wrist)[1],
+            -left_pivot(fillet_r*2,wrist)[2]-right_fout(fillet_r*2,wrist)[2]+right_pivot(fillet_r*2,wrist)[2]]) {
+  hull() Qrot(left_quat) translate([-left_x/2, -(y+wrist)/2, fillet_r]) {
+      translate([big_corner, big_corner, 0]) rcylinder(r=big_corner, h=2*fillet_r, fillet=fillet_r, center=true); // big corner
+      translate([fillet_r, y+wrist-fillet_r, 0]) sphere(r=fillet_r, center=true); // back left
+      translate([left_x-fillet_r, y+wrist-fillet_r, 0]) sphere(r=fillet_r, center=true); // back right
+      translate([left_x-fillet_r, fillet_r, 0]) sphere(r=fillet_r, center=true); // front right     
+    }    
   }
 }
 
