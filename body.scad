@@ -10,7 +10,7 @@ tent = 17.5;
 split = 25;
 slope = 7.5;
 
-//$fa=1; $fs=1;
+//$fa=2; $fs=2;
 
 // from http://builder.swillkb.com/
 // 20 mm padding, 7.5 mm corners
@@ -78,6 +78,8 @@ difference() {
     right_side();
     //brains();
   }
+  left_well();
+  right_well();
 }
 
 module brains() {
@@ -103,69 +105,69 @@ echo(gap_y=gap_y);
 echo(gap_z=gap_z);
 
 module left_side() {
-  difference() {
-    hull() {
-      difference() {
-        // footprint shadow projected up
-        linear_extrude(height=z) projection(cut=false) left_footprint();
-        // slice choppped off top to make wedge
-        translate(v=[
-                  -left_npivot(over_z)[0],
-                  -left_ngap(over_z)[1],
-                  -left_pivot(-over_z)[2]-right_fout(over_z)[2]+right_pivot(over_z)[2]+well_z+extra_z]) {
-          Qrot(left_quat) {
-            cube([left_x+overshoot,y+overshoot,over_z], center=true);  
-          }
+  hull() {
+    difference() {
+      // footprint shadow projected up
+      linear_extrude(height=z) projection(cut=false) left_footprint();
+      // slice choppped off top to make wedge
+      translate(v=[
+                -left_npivot(over_z)[0],
+                -left_ngap(over_z)[1],
+                -left_pivot(-over_z)[2]-right_fout(over_z)[2]+right_pivot(over_z)[2]+well_z+extra_z]) {
+        Qrot(left_quat) {
+          cube([left_x+overshoot,y+overshoot,over_z], center=true);  
         }
       }
-      // fillet top
-      translate([0,0,well_z+extra_z]) left_footprint();
     }
-    // keyboard well
-    translate(v=[
-              -left_pivot(well_z)[0],
-              -left_gap(well_z)[1],
-              -left_pivot(well_z-1)[2]-right_fout(well_z-1)[2]+right_pivot(well_z-1)[2]+well_z+extra_z+fillet_r]) {
-      Qrot(left_quat) {
-        translate(v=[-left_plate_x/2,-plate_y/2,0]) {
-          linear_extrude(height=well_z, center=true) import("left_bottom.dxf");  
-        }
+    // fillet top
+    translate([0,0,well_z+extra_z]) left_footprint();
+  }
+}
+
+module left_well() {
+  translate(v=[
+            -left_pivot(well_z)[0],
+            -left_gap(well_z)[1],
+            -left_pivot(well_z-1)[2]-right_fout(well_z-1)[2]+right_pivot(well_z-1)[2]+well_z+extra_z+fillet_r]) {
+    Qrot(left_quat) {
+      translate(v=[-left_plate_x/2,-plate_y/2,0]) {
+        linear_extrude(height=well_z, center=true) import("left_bottom.dxf");  
       }
     }
   }
 }
 
 module right_side() {
-  difference() {
-    hull() {
-      difference() {
-        // footprint shadow projected up
-        linear_extrude(height=z) projection(cut=false) right_footprint(h=1); 
-        // slice choppped off top to make wedge
-        translate(v=[
-                  -right_npivot(over_z)[0],
-                  -right_ngap(over_z)[1],
-                  right_pivot(over_z)[2]+well_z+extra_z]) {
-          Qrot(right_quat) {
-            cube([right_x+overshoot,y+overshoot+wrist,over_z], center=true);
-          }
+  hull() {
+    difference() {
+      // footprint shadow projected up
+      linear_extrude(height=z) projection(cut=false) right_footprint(h=1); 
+      // slice choppped off top to make wedge
+      translate(v=[
+                -right_npivot(over_z)[0],
+                -right_ngap(over_z)[1],
+                right_pivot(over_z)[2]+well_z+extra_z]) {
+        Qrot(right_quat) {
+          cube([right_x+overshoot,y+overshoot+wrist,over_z], center=true);
         }
       }
-      // fillet top
-      translate([0,0,well_z+extra_z]) right_footprint();
     }
-    // keyboard well
-    translate(v=[
-              -right_pivot(well_z)[0],
-              -right_gap(well_z)[1],
-              -right_fout(well_z-1)[2]+well_z+extra_z+fillet_r]) {
-      Qrot(right_quat) {
-        translate(v=[-right_plate_x/2,-plate_y/2,0]) {
-          linear_extrude(height=well_z, center=true) import("right_bottom.dxf");  
-        }
-      }    
-    }
-  } 
+    // fillet top
+    translate([0,0,well_z+extra_z]) right_footprint();
+  }
+}
+
+module right_well() {
+  translate(v=[
+            -right_pivot(well_z)[0],
+            -right_gap(well_z)[1],
+            -right_fout(well_z-1)[2]+well_z+extra_z+fillet_r]) {
+    Qrot(right_quat) {
+      translate(v=[-right_plate_x/2,-plate_y/2,0]) {
+        linear_extrude(height=well_z, center=true) import("right_bottom.dxf");  
+      }
+    }    
+  }  
 }
 
 module left_footprint() {
