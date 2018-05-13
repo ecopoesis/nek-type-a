@@ -38,7 +38,7 @@ well_z = 20;
 extra_z = 5;
 
 // wrist rest depth (y-ish)
-wrist = 100;
+wrist = 62;
 
 fillet_r = 10;
 big_corner = 90;
