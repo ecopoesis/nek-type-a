@@ -8,7 +8,7 @@ tent = 17.5;
 split = 25;
 slope = 7.5;
 
-$fa=1; $fs=1;
+//$fa=1; $fs=1;
 
 // from http://builder.swillkb.com/
 // 20 mm padding, 7.5 mm corners
@@ -27,7 +27,7 @@ y = plate_y + (2 * extra_base);
 overshoot = 300;
 over_z = 150;
 
-// how deep it the keyboard well
+// how deep is the keyboard well
 // should be < 3x plate corners
 well_z = 20; 
 
@@ -80,8 +80,6 @@ difference() {
     right();
     //brains();
   }
-  right_fillet();
-  left_fillet();
 }
 
 module brains() {
@@ -200,79 +198,4 @@ module right_footprint(h) {
       cube([right_x,y+wrist,h], center=true);
     }
   }
-}
-
-module right_fillet() {
-  translate(v=[
-            -right_pivot(1,wrist)[0],
-            -right_gap(1,wrist)[1],
-            -right_fout(1,wrist)[2]+well_z+extra_z]) {
-    Qrot(right_quat){
-      // right edge
-      translate([(right_x/2),0,.5]) yrot(-tent) zrot(90) yrot(90) 
-      fillet_angled_edge_mask(h=y+wrist, r=radius, ang=90+tent);
-    
-      // top edge
-      translate([0,(y+wrist)/2,.5]) yrot(90)
-      fillet_angled_edge_mask(h=right_x, r=radius, ang=90+slope);
-      
-      // bottom edge
-      translate([0,-(y+wrist)/2,.5]) yrot(90)
-      fillet_angled_edge_mask(h=right_x, r=radius, ang=90+slope);
-    }
-  }
-  
-  // front corner
-  translate(v=[
-             Q_Rot_Vector([right_x/2,(-y-wrist)/2,.5], right_quat)[0]-right_pivot(1,wrist)[0],
-             Q_Rot_Vector([right_x/2,(-y-wrist)/2,.5], right_quat)[1]-right_gap(1,wrist)[1],
-             -right_fout(1,wrist)[2]]) 
-  zrot(true_split) fillet_mask_z(l=z, r=radius);
-  
-  // back corner
-  translate(v=[
-             Q_Rot_Vector([right_x/2,(y+wrist)/2,.5], right_quat)[0]-right_pivot(1,wrist)[0],
-             Q_Rot_Vector([right_x/2,(y+wrist)/2,.5], right_quat)[1]-right_gap(1,wrist)[1],
-             -right_fout(1,wrist)[2]]) 
-  zrot(true_split) fillet_mask_z(l=z, r=radius); 
-}
-
-module left_fillet() {
-  translate(v=[
-            -left_pivot(1,wrist)[0],
-            -left_gap(1,wrist)[1],
-            -left_pivot(1,wrist)[2]-right_fout(1,wrist)[2]+right_pivot(1,wrist)[2]+well_z+extra_z]) {
-    Qrot(left_quat){
-      // left edge
-      translate([-left_x/2,0,.5]) yrot(tent) zrot(90) yrot(90) 
-      fillet_angled_edge_mask(h=y+wrist, r=radius, ang=90+tent);
-
-      // top edge
-      translate([0,(y+wrist)/2,.5]) yrot(90)
-      fillet_angled_edge_mask(h=left_x, r=radius, ang=90+slope);
-      
-      // bottom edge
-      translate([0,-(y+wrist)/2,.5]) yrot(90)
-      fillet_angled_edge_mask(h=left_x, r=radius, ang=90+slope);
-            
-      // left front corner
-      //translate([-left_x/2,-(y+wrist)/2,.5]) zrot(90)
-      //fillet_angled_corner_mask(fillet=radius, ang=90+slope);
-    }   
-   
-  }
-  
-  // front corner
-  translate(v=[
-             Q_Rot_Vector([-left_x/2,(-y-wrist)/2,.5], left_quat)[0]-left_pivot(1,wrist)[0],
-             Q_Rot_Vector([-left_x/2,(-y-wrist)/2,.5], left_quat)[1]-left_gap(1,wrist)[1],
-             -left_pivot(1,wrist)[2]-right_fout(1,wrist)[2]+right_pivot(1,wrist)[2]]) 
-  zrot(-true_split) fillet_mask_z(l=z, r=radius);
-  
-  // back corner
-  translate(v=[
-             Q_Rot_Vector([-left_x/2,(y+wrist)/2,.5], left_quat)[0]-left_pivot(1,wrist)[0],
-             Q_Rot_Vector([-left_x/2,(y+wrist)/2,.5], left_quat)[1]-left_gap(1,wrist)[1],
-             -left_pivot(1,wrist)[2]-right_fout(1,wrist)[2]+right_pivot(1,wrist)[2]]) 
-  zrot(-true_split) fillet_mask_z(l=z, r=radius); 
 }
