@@ -40,7 +40,8 @@ extra_z = 5;
 wrist = 100;
 
 fillet_r = 7.5;
-big_corner = 55;
+front_fillet = fillet_r * 4;
+big_corner = fillet_r * 9;
 
 // feather size
 feather = [22.86,50.8,0];
@@ -71,16 +72,8 @@ function right_fout(h,w=0) = Q_Rot_Vector([right_x/2,-y/2+w/2,h/2], right_quat);
 // total height is the height at the wide part of the gap
 z=right_gap(1,-wrist)[2]-right_fout(1,wrist)[2]+well_z+extra_z;
 
-//projection(cut=false) left_footprint_old(1);
-//#projection(cut=false) left_footprint();
-
-//left_fillet(1);
-//right_footprint(1);
-//right_fillet(1);
-
 difference() {
-  union() {
-    center();
+  hull() {
     left_side();
     right_side();
     //brains();
@@ -108,26 +101,6 @@ echo(pivot_z=pivot_z);
 echo(gap_x=gap_x);
 echo(gap_y=gap_y);
 echo(gap_z=gap_z);
-
-module center() {
-  polyhedron(
-    points=[
-      [0,pivot_y,pivot_z],  // 0 - top pivot 
-      [0,pivot_y,0],        // 1 - bottom pivot
-      [-gap_x,gap_y,gap_z], // 2 - top left gap
-      [gap_x,gap_y,gap_z],  // 3 - top right gap
-      [-gap_x,gap_y,0],     // 4 - bottom left gap
-      [gap_x,gap_y,0]       // 5 - bottom right gap
-    ],
-    faces=[
-      [0,3,2],
-      [1,4,5],
-      [0,2,4,1],
-      [3,0,1,5],
-      [2,3,5,4]
-    ]
-  );
-}
 
 module left_side() {
   difference() {
