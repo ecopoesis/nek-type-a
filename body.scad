@@ -164,22 +164,28 @@ module left_side() {
 
 module right_side() {
   difference() {
-    // footprint shadow projected up
-    linear_extrude(height=z) projection(cut=false) right_footprint(h=1); 
-    // slice choppped off top to make wedge
-    translate(v=[
-              -right_npivot(over_z)[0],
-              -right_ngap(over_z)[1],
-              right_pivot(over_z)[2]+well_z+extra_z]) {
-      Qrot(right_quat) {
-        cube([right_x+overshoot,y+overshoot+wrist,over_z], center=true);
+    hull() {
+      difference() {
+        // footprint shadow projected up
+        linear_extrude(height=z) projection(cut=false) right_footprint(h=1); 
+        // slice choppped off top to make wedge
+        translate(v=[
+                  -right_npivot(over_z)[0],
+                  -right_ngap(over_z)[1],
+                  right_pivot(over_z)[2]+well_z+extra_z]) {
+          Qrot(right_quat) {
+            cube([right_x+overshoot,y+overshoot+wrist,over_z], center=true);
+          }
+        }
       }
+      // fillet top
+      translate([0,0,well_z+extra_z]) right_footprint();
     }
     // keyboard well
     translate(v=[
               -right_pivot(well_z)[0],
               -right_gap(well_z)[1],
-              -right_fout(well_z-1)[2]+well_z+extra_z]) {
+              -right_fout(well_z-1)[2]+well_z+extra_z+fillet_r]) {
       Qrot(right_quat) {
         translate(v=[-right_plate_x/2,-plate_y/2,0]) {
           linear_extrude(height=well_z, center=true) import("right_bottom.dxf");  
@@ -189,23 +195,12 @@ module right_side() {
   } 
 }
 
-module left_footprint_old(h) {
-  translate(v=[
-            -left_pivot(h,wrist)[0],
-            -left_gap(h,wrist)[1],
-            -left_pivot(h,wrist)[2]-right_fout(h,wrist)[2]+right_pivot(h,wrist)[2]]) {
-    Qrot(left_quat) {
-      cube([left_x,y+wrist,h], center=true);  
-    }
-  }
-}
-
 module left_footprint() {
   translate(v=[
             -left_pivot(fillet_r*2,wrist)[0],
             -left_gap(fillet_r*2,wrist)[1],
             -left_pivot(fillet_r*2,wrist)[2]-right_fout(fillet_r*2,wrist)[2]+right_pivot(fillet_r*2,wrist)[2]]) {
-  hull() Qrot(left_quat) translate([-left_x/2, -(y+wrist)/2, fillet_r]) {
+    hull() Qrot(left_quat) translate([-left_x/2, -(y+wrist)/2, fillet_r]) {
       translate([big_corner, big_corner, 0]) rcylinder(r=big_corner, h=2*fillet_r, fillet=fillet_r, center=true); // big corner
       translate([fillet_r, y+wrist-fillet_r, 0]) sphere(r=fillet_r, center=true); // back left
       translate([left_x-fillet_r, y+wrist-fillet_r, 0]) sphere(r=fillet_r, center=true); // back right
@@ -214,13 +209,16 @@ module left_footprint() {
   }
 }
 
-module right_footprint(h) {
+module right_footprint() {
   translate(v=[
-            -right_pivot(h,wrist)[0],
-            -right_gap(h,wrist)[1],
-            -right_fout(h,wrist)[2]]) {
-    Qrot(right_quat){
-      cube([right_x,y+wrist,h], center=true);
+          -right_pivot(fillet_r*2,wrist)[0],
+          -right_gap(fillet_r*2,wrist)[1],
+          -right_fout(fillet_r*2,wrist)[2]]) {
+    hull() Qrot(right_quat) translate([-right_x/2, -(y+wrist)/2, fillet_r]) {
+      translate([right_x-big_corner, big_corner, 0]) rcylinder(r=big_corner, h=2*fillet_r, fillet=fillet_r, center=true); // big corner
+      translate([fillet_r, y+wrist-fillet_r, 0]) sphere(r=fillet_r, center=true); // back left
+      translate([right_x-fillet_r, y+wrist-fillet_r, 0]) sphere(r=fillet_r, center=true); // back right
+      translate([fillet_r, fillet_r, 0]) sphere(r=fillet_r, center=true); // front left     
     }
   }
 }
