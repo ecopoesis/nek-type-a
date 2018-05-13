@@ -5,6 +5,7 @@ include <bosl/shapes.scad>
 include <bosl/transforms.scad>
 
 // taps should be >= M6
+// 13.44 mm diameter head
 
 tent = 17.5;
 split = 25;
@@ -13,10 +14,10 @@ slope = 7.5;
 //$fa=2; $fs=2;
 
 // from http://builder.swillkb.com/
-// 20 mm padding, 7.5 mm corners
-left_plate_x = 178.114;
-right_plate_x = 235.264;
-plate_y = 156.778; // for right, left is 154.302
+// 25 mm padding, 7.5 mm corners
+left_plate_x = 173.352;
+right_plate_x = 263.839;
+plate_y = 159.064; // for right, left is 154.302
 
 // how much to add to the plates to make the base
 extra_base = 15;
@@ -39,9 +40,8 @@ extra_z = 5;
 // wrist rest depth (y-ish)
 wrist = 100;
 
-fillet_r = 7.5;
-front_fillet = fillet_r * 4;
-big_corner = fillet_r * 9;
+fillet_r = 10;
+big_corner = 90;
 
 // feather size
 feather = [22.86,50.8,0];
@@ -128,7 +128,7 @@ module left_well() {
   translate(v=[
             -left_pivot(well_z)[0],
             -left_gap(well_z)[1],
-            -left_pivot(well_z-1)[2]-right_fout(well_z-1)[2]+right_pivot(well_z-1)[2]+well_z+extra_z+fillet_r]) {
+            -left_pivot(well_z-1)[2]-right_fout(well_z-1)[2]+right_pivot(well_z-1)[2]+well_z+extra_z+fillet_r+.5]) {
     Qrot(left_quat) {
       translate(v=[-left_plate_x/2,-plate_y/2,0]) {
         linear_extrude(height=well_z, center=true) import("left_bottom.dxf");  
@@ -161,7 +161,7 @@ module right_well() {
   translate(v=[
             -right_pivot(well_z)[0],
             -right_gap(well_z)[1],
-            -right_fout(well_z-1)[2]+well_z+extra_z+fillet_r]) {
+            -right_fout(well_z-1)[2]+well_z+extra_z+fillet_r+.5]) {
     Qrot(right_quat) {
       translate(v=[-right_plate_x/2,-plate_y/2,0]) {
         linear_extrude(height=well_z, center=true) import("right_bottom.dxf");  
