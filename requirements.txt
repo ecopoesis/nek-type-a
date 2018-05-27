@@ -1,0 +1,5 @@
+cadquery==1.2.0
+numpy==1.14.3
+numpy-quaternion==2018.5.17.10.19.59
+pyparsing==2.2.0
+virtualenv==16.0.0
