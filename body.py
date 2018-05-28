@@ -40,24 +40,43 @@ left_x = left_plate_x + (2 * extra_base)
 right_x = right_plate_x + (2 * extra_base)
 y = plate_y + (2 * extra_base)
 
-# right side
-big_corner_x = right_x-big_corner+(big_corner*math.sin(math.radians(45)))
-big_corner_y = big_corner-(big_corner*math.cos(math.radians(45)))
-
-small_corner_x = right_x-small_corner+(small_corner*math.sin(math.radians(45)))
-small_corner_y = y+wrist-small_corner+(small_corner*math.cos(math.radians(45)))
-
 path = cq.Workplane("XZ").lineTo(0, 100)
 
-result = cq.Workplane("XY") \
-     .transformed(rotate=cq.Vector(-slope, tent, split/2)) \
-     .lineTo(right_x-big_corner, 0) \
-     .threePointArc((big_corner_x, big_corner_y), (right_x, big_corner)) \
-     .lineTo(right_x, y+wrist-small_corner) \
-     .threePointArc((small_corner_x, small_corner_y), (right_x-small_corner, y+wrist)) \
-     .lineTo(0, y+wrist) \
-     .close() \
-     .sweep(path) \
-     .faces(">Y").edges().fillet(fillet_r)
 
-show_object(result)
+def right():
+    big_corner_x = right_x-big_corner+(big_corner*math.sin(math.radians(45)))
+    big_corner_y = big_corner-(big_corner*math.cos(math.radians(45)))
+    small_corner_x = right_x-small_corner+(small_corner*math.sin(math.radians(45)))
+    small_corner_y = y+wrist-small_corner+(small_corner*math.cos(math.radians(45)))
+
+    return cq.Workplane("XY") \
+        .transformed(rotate=cq.Vector(-slope, tent, split/2)) \
+        .lineTo(right_x-big_corner, 0) \
+        .threePointArc((big_corner_x, big_corner_y), (right_x, big_corner)) \
+        .lineTo(right_x, y+wrist-small_corner) \
+        .threePointArc((small_corner_x, small_corner_y), (right_x-small_corner, y+wrist)) \
+        .lineTo(0, y+wrist) \
+        .close() \
+        .sweep(path) \
+        .faces(">Y").edges().fillet(fillet_r)
+
+
+def left():
+    big_corner_x = -left_x+big_corner-(big_corner*math.sin(math.radians(45)))
+    big_corner_y = big_corner-(big_corner*math.cos(math.radians(45)))
+    small_corner_x = -left_x+small_corner-(small_corner*math.sin(math.radians(45)))
+    small_corner_y = y+wrist-small_corner+(small_corner*math.cos(math.radians(45)))
+
+    return cq.Workplane("XY") \
+        .transformed(rotate=cq.Vector(-slope, -tent, -split/2)) \
+        .lineTo(-left_x+big_corner, 0) \
+        .threePointArc((big_corner_x, big_corner_y), (-left_x, big_corner)) \
+        .lineTo(-left_x, y+wrist-small_corner) \
+        .threePointArc((small_corner_x, small_corner_y), (-left_x+small_corner, y+wrist)) \
+        .lineTo(0, y+wrist) \
+        .close() \
+        .sweep(path) \
+        .faces(">Y").edges().fillet(fillet_r)
+
+
+show_object(right().union(left()))
