@@ -47,17 +47,17 @@ big_corner_y = big_corner-(big_corner*math.cos(math.radians(45)))
 small_corner_x = right_x-small_corner+(small_corner*math.sin(math.radians(45)))
 small_corner_y = y+wrist-small_corner+(small_corner*math.cos(math.radians(45)))
 
-path = cq.Workplane("XZ").lineTo(-10, 50)
+path = cq.Workplane("XZ").lineTo(0, 100)
 
 result = cq.Workplane("XY") \
+     .transformed(rotate=cq.Vector(-slope, tent, split/2)) \
      .lineTo(right_x-big_corner, 0) \
      .threePointArc((big_corner_x, big_corner_y), (right_x, big_corner)) \
      .lineTo(right_x, y+wrist-small_corner) \
      .threePointArc((small_corner_x, small_corner_y), (right_x-small_corner, y+wrist)) \
      .lineTo(0, y+wrist) \
-     .close().sweep(path) \
-     .faces("+Z").edges().fillet(fillet_r)
+     .close() \
+     .sweep(path) \
+     .faces(">Y").edges().fillet(fillet_r)
 
 show_object(result)
-
-cq.SubtractSelector
