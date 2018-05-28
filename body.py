@@ -42,23 +42,32 @@ y = plate_y + (2 * extra_base)
 
 path = cq.Workplane("XZ").lineTo(0, 100)
 
+# global 0,0,0 is the pivot point where the halves meet
 
 def right():
     big_corner_x = right_x-big_corner+(big_corner*math.sin(math.radians(45)))
-    big_corner_y = big_corner-(big_corner*math.cos(math.radians(45)))
+    big_corner_y = -y-wrist+big_corner-(big_corner*math.cos(math.radians(45)))
     small_corner_x = right_x-small_corner+(small_corner*math.sin(math.radians(45)))
-    small_corner_y = y+wrist-small_corner+(small_corner*math.cos(math.radians(45)))
+    small_corner_y = -small_corner+(small_corner*math.cos(math.radians(45)))
+
+    print(0, -(y+wrist))
+    print(right_x-big_corner, -(y+wrist))
+    print(big_corner_x, big_corner_y)
+    print(right_x, -y-wrist+big_corner)
+    print(right_x, -small_corner)
+    print(small_corner_x, small_corner_y)
+    print(right_x-small_corner, 0)
 
     return cq.Workplane("XY") \
-        .transformed(rotate=cq.Vector(-slope, tent, split/2)) \
-        .lineTo(right_x-big_corner, 0) \
-        .threePointArc((big_corner_x, big_corner_y), (right_x, big_corner)) \
-        .lineTo(right_x, y+wrist-small_corner) \
-        .threePointArc((small_corner_x, small_corner_y), (right_x-small_corner, y+wrist)) \
-        .lineTo(0, y+wrist) \
-        .close() \
-        .sweep(path) \
-        .faces(">Y").edges().fillet(fillet_r)
+         .transformed(rotate=cq.Vector(-slope, tent, split/2)) \
+         .lineTo(0, -(y+wrist)) \
+         .lineTo(right_x-big_corner, -(y+wrist)) \
+         .threePointArc((big_corner_x, big_corner_y), (right_x, -y-wrist+big_corner)) \
+         .lineTo(right_x, -small_corner) \
+         .threePointArc((small_corner_x, small_corner_y), (right_x-small_corner, 0)) \
+         .close() \
+         .sweep(path) \
+         .faces(">Y").edges().fillet(fillet_r)
 
 
 def left():
@@ -78,5 +87,6 @@ def left():
         .sweep(path) \
         .faces(">Y").edges().fillet(fillet_r)
 
+#show_object(left())
 
 show_object(right().union(left()))
