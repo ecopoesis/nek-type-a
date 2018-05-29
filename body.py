@@ -44,30 +44,24 @@ path = cq.Workplane("XZ").lineTo(0, 100)
 
 # global 0,0,0 is the pivot point where the halves meet
 
+
 def right():
     big_corner_x = right_x-big_corner+(big_corner*math.sin(math.radians(45)))
     big_corner_y = -y-wrist+big_corner-(big_corner*math.cos(math.radians(45)))
     small_corner_x = right_x-small_corner+(small_corner*math.sin(math.radians(45)))
     small_corner_y = -small_corner+(small_corner*math.cos(math.radians(45)))
 
-    print(0, -(y+wrist))
-    print(right_x-big_corner, -(y+wrist))
-    print(big_corner_x, big_corner_y)
-    print(right_x, -y-wrist+big_corner)
-    print(right_x, -small_corner)
-    print(small_corner_x, small_corner_y)
-    print(right_x-small_corner, 0)
-
     return cq.Workplane("XY") \
-         .transformed(rotate=cq.Vector(-slope, tent, split/2)) \
-         .lineTo(0, -(y+wrist)) \
-         .lineTo(right_x-big_corner, -(y+wrist)) \
-         .threePointArc((big_corner_x, big_corner_y), (right_x, -y-wrist+big_corner)) \
-         .lineTo(right_x, -small_corner) \
-         .threePointArc((small_corner_x, small_corner_y), (right_x-small_corner, 0)) \
-         .close() \
-         .sweep(path) \
-         .faces(">Y").edges().fillet(fillet_r)
+        .transformed(rotate=cq.Vector(0, tent, split/2)) \
+        .transformed(rotate=cq.Vector(-slope, 0, 0)) \
+        .lineTo(0, -(y+wrist)) \
+        .lineTo(right_x-big_corner, -(y+wrist)) \
+        .threePointArc((big_corner_x, big_corner_y), (right_x, -y-wrist+big_corner)) \
+        .lineTo(right_x, -small_corner) \
+        .threePointArc((small_corner_x, small_corner_y), (right_x-small_corner, 0)) \
+        .close() \
+        .sweep(path) \
+        .faces(">Y").edges().fillet(fillet_r)
 
 
 def left():
@@ -77,7 +71,8 @@ def left():
     small_corner_y = -small_corner+(small_corner*math.cos(math.radians(45)))
 
     return cq.Workplane("XY") \
-        .transformed(rotate=cq.Vector(-slope, -tent, -split/2)) \
+        .transformed(rotate=cq.Vector(0, -tent, -split/2)) \
+        .transformed(rotate=cq.Vector(-slope, 0, 0)) \
         .lineTo(0, -(y+wrist)) \
         .lineTo(-left_x+big_corner, -(y+wrist)) \
         .threePointArc((big_corner_x, big_corner_y), (-left_x, -y-wrist+big_corner)) \
@@ -88,4 +83,43 @@ def left():
         .faces(">Y").edges().fillet(fillet_r)
 
 
-show_object(right().union(left()))
+def center():
+    wp = cq.Workplane("XY") \
+        .transformed(rotate=cq.Vector(-slope, 0, 0))
+
+    right = wp.plane.toLocalCoords(right_gap_bottom())
+    left = wp.plane.toLocalCoords(left_gap_bottom())
+
+    print('center')
+    print(right)
+    print(left)
+
+    return wp \
+        .lineTo(right.x, right.y) \
+        .lineTo(left.x, left.y) \
+        .close() \
+        .sweep(path)
+
+
+def right_gap_bottom():
+    return cq.Workplane("XY") \
+        .transformed(rotate=cq.Vector(0, tent, split/2)) \
+        .transformed(rotate=cq.Vector(-slope, 0, 0)) \
+        .plane.toWorldCoords((0, -(y+wrist)))
+
+
+def left_gap_bottom():
+    return cq.Workplane("XY") \
+        .transformed(rotate=cq.Vector(0, -tent, -split/2)) \
+        .transformed(rotate=cq.Vector(-slope, 0, 0)) \
+        .plane.toWorldCoords((0, -(y+wrist)))
+
+
+print(left_gap_bottom())
+print(right_gap_bottom())
+
+body = center() \
+    .union(right()) \
+    .union(left())
+
+show_object(body)
