@@ -60,8 +60,7 @@ def right():
         .lineTo(right_x, -small_corner) \
         .threePointArc((small_corner_x, small_corner_y), (right_x-small_corner, 0)) \
         .close() \
-        .sweep(path) \
-        .faces(">Y").edges().fillet(fillet_r)
+        .sweep(path)
 
 
 def left():
@@ -79,8 +78,7 @@ def left():
         .lineTo(-left_x, -small_corner) \
         .threePointArc((small_corner_x, small_corner_y), (-left_x+small_corner, 0)) \
         .close() \
-        .sweep(path) \
-        .faces(">Y").edges().fillet(fillet_r)
+        .sweep(path)
 
 
 def center():
@@ -120,6 +118,8 @@ print(right_gap_bottom())
 
 body = center() \
     .union(right()) \
-    .union(left())
+    .union(left()) \
+    .edges().fillet(fillet_r)
+
 
 show_object(body)
