@@ -2,6 +2,9 @@
 #import numpy as np
 import math
 #import quaternion as quat
+import logging
+import sys
+logging.basicConfig(stream=sys.stderr, level=logging.DEBUG)
 
 thickness = 10.0
 
@@ -88,9 +91,9 @@ def center():
     right = wp.plane.toLocalCoords(right_gap_bottom())
     left = wp.plane.toLocalCoords(left_gap_bottom())
 
-    print('center')
-    print(right)
-    print(left)
+    logging.debug('center')
+    logging.debug(right)
+    logging.debug(left)
 
     return wp \
         .lineTo(right.x, right.y) \
@@ -113,8 +116,8 @@ def left_gap_bottom():
         .plane.toWorldCoords((0, -(y+wrist)))
 
 
-print(left_gap_bottom())
-print(right_gap_bottom())
+logging.debug(left_gap_bottom())
+logging.debug(right_gap_bottom())
 
 body = center() \
     .union(right()) \
