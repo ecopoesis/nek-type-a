@@ -1,2 +1,6 @@
-body-to-step: body.py
-	cat body.py | docker run -i dcowden/cadquery:latest build --in_spec stdin --format STEP --out_spec stdout > body.step
+body.step: body.py .docker-build
+	cat body.py | docker run -i ecopoesis/cadquery:latest build --in_spec stdin --format STEP --out_spec stdout > body.step
+
+.docker-build: Dockerfile
+	docker build . -t ecopoesis/cadquery
+	@touch $@

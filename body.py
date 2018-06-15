@@ -1,7 +1,7 @@
 ﻿import cadquery as cq
-#import numpy as np
+import numpy as np
 import math
-#import quaternion as quat
+import quaternion as quat
 import logging
 import sys
 logging.basicConfig(stream=sys.stderr, level=logging.DEBUG)
