@@ -42,11 +42,11 @@ big_corner = 90
 left_x = left_plate_x + (2 * extra_base)
 right_x = right_plate_x + (2 * extra_base)
 y = plate_y + (2 * extra_base)
-extrude = 100
+extrude = 150
 
 path = cq.Workplane("XZ").lineTo(0, extrude)
 
-# global 0,0,0 is the pivot point where the halves meet
+# global 0,0,0 is the pivot point where the halves meet on the bottom
 
 
 def right():
@@ -117,22 +117,19 @@ def right_back_corner():
     return cq.Workplane("XY") \
         .transformed(rotate=cq.Vector(0, tent, split/2)) \
         .transformed(rotate=cq.Vector(-slope, 0, 0)) \
-        .plane.toWorldCoords((right_x, 0))
+        .plane.toWorldCoords((right_x-small_corner, 0))
 
 
 def left_back_corner():
     return cq.Workplane("XY") \
         .transformed(rotate=cq.Vector(0, -tent, -split/2)) \
         .transformed(rotate=cq.Vector(-slope, 0, 0)) \
-        .plane.toWorldCoords((-left_x, 0))
+        .plane.toWorldCoords((-left_x+small_corner, 0))
 
 
 def back():
     right_corner = right_back_corner()
     left_corner = left_back_corner()
-
-    log.debug(right_corner)
-    log.debug(left_corner)
 
     # compute the plane from these vectors
     p1 = np.array([0, 0, extrude])
@@ -144,25 +141,26 @@ def back():
     v2 = p2 - p1
 
     # the cross product is a vector normal to the plane
-    cp = np.cross(v1, v2)
-    a, b, c = cp
+    normal = np.cross(v1, v2)
 
-    # This evaluates a * x3 + b * y3 + c * z3 which equals d
-    d = np.dot(cp, p3)
+    plane = cq.Plane((0, 0, extrude), (1, 0, 0), (normal[0], normal[1], normal[2]))
 
-    log.debug(cp)
-    log.debug(cp[0])
-    log.debug(cp[1])
-    log.debug(cp[2])
+    right_transformed = plane.toLocalCoords(cq.Vector(right_corner.x, right_corner.y, right_corner.z+extrude))
+    left_transformed = plane.toLocalCoords(cq.Vector(left_corner.x, left_corner.y, left_corner.z+extrude))
 
-    plane = cq.Plane((0, 0, extrude), (1, 0, 0), (cp[0], cp[1], cp[2]))
     return cq.Workplane(plane) \
-        .box(800, 200, 10)
+        .lineTo(right_transformed.x, right_transformed.y) \
+        .lineTo(left_transformed.x, left_transformed.y) \
+        .close() \
+        .sweep(path)
 
 
-def origin():
+def chop():
+    depth = right_back_corner().z * -2
+    log.debug(right_back_corner())
     return cq.Workplane("XY") \
-        .box(600, 300, 10)
+        .transformed(offset=(0, right_gap_bottom().y / 2, right_gap_bottom().z - depth + (depth / 2) + fillet_r)) \
+        .box(800, 400, depth)
 
 
 def debox(x, y, z):
@@ -170,10 +168,13 @@ def debox(x, y, z):
         .transformed(offset=(x, y, z)) \
         .box(50, 50, 50)
 
+
 body = center() \
     .union(right()) \
     .union(left()) \
-    .edges().fillet(fillet_r) \
-    .union(back())
+    .union(back()) \
+    .cut(chop())
+
+#     .edges().fillet(fillet_r) \
 
 show_object(body)
