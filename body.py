@@ -2,9 +2,9 @@
 import numpy as np
 import math
 import quaternion as quat
-import logging
+import logging as log
 import sys
-logging.basicConfig(stream=sys.stderr, level=logging.DEBUG)
+log.basicConfig(stream=sys.stderr, level=log.DEBUG)
 
 thickness = 10.0
 
@@ -42,8 +42,9 @@ big_corner = 90
 left_x = left_plate_x + (2 * extra_base)
 right_x = right_plate_x + (2 * extra_base)
 y = plate_y + (2 * extra_base)
+extrude = 100
 
-path = cq.Workplane("XZ").lineTo(0, 100)
+path = cq.Workplane("XZ").lineTo(0, extrude)
 
 # global 0,0,0 is the pivot point where the halves meet
 
@@ -91,10 +92,6 @@ def center():
     right = wp.plane.toLocalCoords(right_gap_bottom())
     left = wp.plane.toLocalCoords(left_gap_bottom())
 
-    logging.debug('center')
-    logging.debug(right)
-    logging.debug(left)
-
     return wp \
         .lineTo(right.x, right.y) \
         .lineTo(left.x, left.y) \
@@ -116,13 +113,67 @@ def left_gap_bottom():
         .plane.toWorldCoords((0, -(y+wrist)))
 
 
-logging.debug(left_gap_bottom())
-logging.debug(right_gap_bottom())
+def right_back_corner():
+    return cq.Workplane("XY") \
+        .transformed(rotate=cq.Vector(0, tent, split/2)) \
+        .transformed(rotate=cq.Vector(-slope, 0, 0)) \
+        .plane.toWorldCoords((right_x, 0))
+
+
+def left_back_corner():
+    return cq.Workplane("XY") \
+        .transformed(rotate=cq.Vector(0, -tent, -split/2)) \
+        .transformed(rotate=cq.Vector(-slope, 0, 0)) \
+        .plane.toWorldCoords((-left_x, 0))
+
+
+def back():
+    right_corner = right_back_corner()
+    left_corner = left_back_corner()
+
+    log.debug(right_corner)
+    log.debug(left_corner)
+
+    # compute the plane from these vectors
+    p1 = np.array([0, 0, extrude])
+    p2 = np.array([right_corner.x, right_corner.y, right_corner.z+extrude])
+    p3 = np.array([left_corner.x, left_corner.y, left_corner.z+extrude])
+
+    # These two vectors are in the plane
+    v1 = p3 - p1
+    v2 = p2 - p1
+
+    # the cross product is a vector normal to the plane
+    cp = np.cross(v1, v2)
+    a, b, c = cp
+
+    # This evaluates a * x3 + b * y3 + c * z3 which equals d
+    d = np.dot(cp, p3)
+
+    log.debug(cp)
+    log.debug(cp[0])
+    log.debug(cp[1])
+    log.debug(cp[2])
+
+    plane = cq.Plane((0, 0, extrude), (1, 0, 0), (cp[0], cp[1], cp[2]))
+    return cq.Workplane(plane) \
+        .box(800, 200, 10)
+
+
+def origin():
+    return cq.Workplane("XY") \
+        .box(600, 300, 10)
+
+
+def debox(x, y, z):
+    return cq.Workplane("XY") \
+        .transformed(offset=(x, y, z)) \
+        .box(50, 50, 50)
 
 body = center() \
     .union(right()) \
     .union(left()) \
-    .edges().fillet(fillet_r)
-
+    .edges().fillet(fillet_r) \
+    .union(back())
 
 show_object(body)
