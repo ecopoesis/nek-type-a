@@ -2,6 +2,7 @@
 import numpy as np
 import math
 import quaternion as quat
+from svgpathtools import svg2paths2
 import logging as log
 import sys
 log.basicConfig(stream=sys.stderr, level=log.DEBUG)
@@ -176,5 +177,7 @@ body = center() \
     .cut(chop())
 
 #     .edges().fillet(fillet_r) \
+
+paths, attributes, svg_attributes = svg2paths2('/opt/cadquery/build_data/right_top.svg')
 
 show_object(body)
