@@ -1,10 +1,13 @@
-﻿import cadquery as cq
+# -*- coding: future_fstrings -*-
+
+import cadquery as cq
 import numpy as np
 import math
 import quaternion as quat
-from svgpathtools import svg2paths2
+from svgpathtools import svg2paths2, Line
 import logging as log
 import sys
+# import pydevd
 log.basicConfig(stream=sys.stderr, level=log.DEBUG)
 
 thickness = 10.0
@@ -45,7 +48,7 @@ right_x = right_plate_x + (2 * extra_base)
 y = plate_y + (2 * extra_base)
 extrude = 150
 
-path = cq.Workplane("XZ").lineTo(0, extrude)
+depth_path = cq.Workplane("XZ").lineTo(0, extrude)
 
 # global 0,0,0 is the pivot point where the halves meet on the bottom
 
@@ -65,7 +68,7 @@ def right():
         .lineTo(right_x, -small_corner) \
         .threePointArc((small_corner_x, small_corner_y), (right_x-small_corner, 0)) \
         .close() \
-        .sweep(path)
+        .sweep(depth_path)
 
 
 def left():
@@ -83,7 +86,7 @@ def left():
         .lineTo(-left_x, -small_corner) \
         .threePointArc((small_corner_x, small_corner_y), (-left_x+small_corner, 0)) \
         .close() \
-        .sweep(path)
+        .sweep(depth_path)
 
 
 def center():
@@ -97,7 +100,7 @@ def center():
         .lineTo(right.x, right.y) \
         .lineTo(left.x, left.y) \
         .close() \
-        .sweep(path)
+        .sweep(depth_path)
 
 
 def right_gap_bottom():
@@ -153,7 +156,7 @@ def back():
         .lineTo(right_transformed.x, right_transformed.y) \
         .lineTo(left_transformed.x, left_transformed.y) \
         .close() \
-        .sweep(path)
+        .sweep(depth_path)
 
 
 def chop():
@@ -169,6 +172,12 @@ def debox(x, y, z):
         .transformed(offset=(x, y, z)) \
         .box(50, 50, 50)
 
+def svg(svg_file, workplane):
+    paths, attributes, svg_attributes = svg2paths2(f'/opt/cadquery/build_data/{svg_file}.svg')
+    polys = list(map(lambda path: (list(map(lambda segment: (segment.start.real, segment.start.imag), path))), paths))
+    log.debug(polys[0][0])
+    log.debug(polys[0][1:])
+    return workplane.moveTo(*polys[1][0]).polyline(polys[1][1:]).close().extrude(extrude)
 
 body = center() \
     .union(right()) \
@@ -178,6 +187,6 @@ body = center() \
 
 #     .edges().fillet(fillet_r) \
 
-paths, attributes, svg_attributes = svg2paths2('/opt/cadquery/build_data/right_top.svg')
+wp = cq.Workplane("XY")
 
-show_object(body)
+show_object(svg('right_top', wp))
