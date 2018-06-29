@@ -1,9 +1,9 @@
 FROM dcowden/cadquery:latest
 
 USER root
-RUN conda install -c conda-forge numpy scipy numba quaternion svgwrite
-RUN pip install svgpathtools
-RUN pip install future-fstrings
-# RUN pip install pycharm-debugger
+COPY environment.yml conda_cq.sh $CQ_HOME/
+RUN cd $CQ_HOME && conda env create environment.yml
+RUN chmod ugo+x /opt/conda/bin/activate $CQ_HOME/conda_cq.sh
 
 USER cq
+ENTRYPOINT [ "/opt/cadquery/conda_cq.sh" ]
