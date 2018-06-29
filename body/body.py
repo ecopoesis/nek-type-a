@@ -75,8 +75,6 @@ def right():
         .sweep(depth_path) \
         .cut(svg('right_top', right_workplane().center(extra_base, -extra_base), -top_plate_depth, [3, 4, 5, 6, 7, 8]))
 
-#[3, 4, 5, 6, 7, 8]
-
 def left():
     big_corner_x = -left_x+big_corner-(big_corner*math.sin(math.radians(45)))
     big_corner_y = -y-wrist+big_corner-(big_corner*math.cos(math.radians(45)))
@@ -92,7 +90,8 @@ def left():
         .lineTo(-left_x, -small_corner) \
         .threePointArc((small_corner_x, small_corner_y), (-left_x+small_corner, 0)) \
         .close() \
-        .sweep(depth_path)
+        .sweep(depth_path) \
+        .cut(svg('left_top', left_workplane().center(-left_plate_x-extra_base, y-extra_base), top_plate_depth, [3, 4, 5], False))
 
 
 def center():
@@ -157,8 +156,21 @@ def right_plane():
     return build_plane(p1, p2, p3, (0, 0, extrude), split/2)
 
 
+def left_plane():
+    left_corner = left_back_corner()
+    left_gap = left_gap_bottom()
+    p1 = np.array([0, 0, extrude])
+    p2 = np.array([left_corner.x, left_corner.y, left_corner.z+extrude])
+    p3 = np.array([left_gap.x, left_gap.y, left_gap.z+extrude])
+    return build_plane(p1, p2, p3, (0, 0, extrude), -split/2)
+
+
 def right_workplane():
     return cq.Workplane(right_plane())
+
+
+def left_workplane():
+    return cq.Workplane(left_plane())
 
 
 def back():
@@ -193,7 +205,7 @@ def debox(x, y, z):
         .transformed(offset=(x, y, z)) \
         .box(50, 50, 50)
 
-def svg(svg_file, workplane, extrude, shapes=None):
+def svg(svg_file, workplane, extrude, shapes=None, invert=True):
     """
     extrude shapes in the svg file on the workplane
     :param svg_file: file name of svg file
@@ -203,8 +215,7 @@ def svg(svg_file, workplane, extrude, shapes=None):
     :return: workplane
     """
     paths, attributes, svg_attributes = svg2paths2(f'{SVG_PATH}{svg_file}.svg')
-    # invert y-coordinate because svg measures from top-left
-    polys = list(map(lambda path: (list(map(lambda segment: (segment.start.real, -segment.start.imag), path))), paths))
+    polys = list(map(lambda path: (list(map(lambda segment: (segment.start.real, (-1 if invert else 1) * segment.start.imag), path))), paths))
     min_x = reduce(lambda acc, i: min(acc, i[0]), itertools.chain.from_iterable(polys), sys.maxsize)
     max_y = reduce(lambda acc, i: max(acc, i[1]), itertools.chain.from_iterable(polys), -sys.maxsize)
 
@@ -222,14 +233,3 @@ body = center() \
 #     .edges().fillet(fillet_r) \
 
 show_object(body)
-
-## right_top
-# 0 - outside
-# 1, 2 - screw
-# 3 - main
-# 4 - arrows
-# 5 - navigation
-# 6 - low function
-# 7 - high function
-# 8 - audio
-# 9, 10 - screw
