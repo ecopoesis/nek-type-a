@@ -20,7 +20,9 @@ slope = 7.5
 
 # size
 # from http://builder.swillkb.com/
-# 25 mm padding, 7.5 mm corners
+# 4 holes, 6 mm, 20 mm2
+# 20 mm padding
+# 7.5 mm corners
 left_plate_x = 173.352
 right_plate_x = 263.839
 plate_y = 159.064
