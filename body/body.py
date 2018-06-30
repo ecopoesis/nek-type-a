@@ -66,8 +66,7 @@ def right():
         .threePointArc((small_corner_x, small_corner_y), (right_x-small_corner, 0)) \
         .close() \
         .sweep(depth_path) \
-        .cut(svg('right_top', right_workplane().center(extra_base, -extra_base), -top_plate_depth, [3, 4, 5, 6, 7, 8])) \
-        .cut(svg('right_top', right_workplane().transformed(offset=(0,0,-top_plate_depth)).center(extra_base, -extra_base), -extrude, [0]))
+        .cut(svg('right_top', right_workplane().center(extra_base, -extra_base), -top_plate_depth, [3, 4, 5, 6, 7, 8]))
 
 
 def left():
@@ -86,8 +85,7 @@ def left():
         .threePointArc((small_corner_x, small_corner_y), (-left_x+small_corner, 0)) \
         .close() \
         .sweep(depth_path) \
-        .cut(svg('left_top', left_workplane().center(-left_plate_x-extra_base, y-extra_base), top_plate_depth, [3, 4, 5], False)) \
-        .cut(svg('left_top', left_workplane().transformed(offset=(0,0,top_plate_depth)).center(-left_plate_x-extra_base, y-extra_base), extrude, [0]))
+        .cut(svg('left_top', left_workplane().center(-left_plate_x-extra_base, y-extra_base), top_plate_depth, [3, 4, 5], False))
 
 
 def center():
@@ -224,7 +222,10 @@ def svg(svg_file, workplane, extrude, shapes=None, invert=True):
 body = center() \
     .union(right()) \
     .union(left()) \
-    .cut(chop())
+    .union(back()) \
+    .cut(chop()) \
+    .cut(svg('right_top', right_workplane().transformed(offset=(0,0,-top_plate_depth)).center(extra_base, -extra_base), -extrude, [0])) \
+    .cut(svg('left_top', left_workplane().transformed(offset=(0,0,top_plate_depth)).center(-left_plate_x-extra_base, y-extra_base), extrude, [0]))
 
 #     .edges().fillet(fillet_r) \
 
