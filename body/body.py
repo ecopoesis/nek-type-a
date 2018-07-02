@@ -8,6 +8,8 @@ from svgpathtools import svg2paths2, Line
 import logging as log
 import sys
 import itertools
+import pyclipper
+
 # import pydevd
 log.basicConfig(stream=sys.stderr, level=log.DEBUG)
 
@@ -37,6 +39,7 @@ wrist = 62
 fillet_r = 10
 small_corner = 10
 big_corner = 90
+keycap_fillet = 3
 
 left_x = left_plate_x + (2 * extra_base)
 right_x = right_plate_x + (2 * extra_base)
@@ -44,6 +47,8 @@ y = plate_y + (2 * extra_base)
 extrude = 150
 
 SVG_PATH = '/opt/cadquery/build_data/'
+
+arc_tolerance = 100000000
 
 depth_path = cq.Workplane("XZ").lineTo(0, extrude)
 
@@ -66,7 +71,7 @@ def right():
         .threePointArc((small_corner_x, small_corner_y), (right_x-small_corner, 0)) \
         .close() \
         .sweep(depth_path) \
-        .cut(svg('right_top', right_workplane().center(extra_base, -extra_base), -top_plate_depth, [3, 4, 5, 6, 7, 8]))
+        .cut(svg('right_top', right_workplane().center(extra_base, -extra_base), -top_plate_depth, [3, 4, 5, 6, 7, 8], fillet=keycap_fillet))
 
 
 def left():
@@ -85,7 +90,7 @@ def left():
         .threePointArc((small_corner_x, small_corner_y), (-left_x+small_corner, 0)) \
         .close() \
         .sweep(depth_path) \
-        .cut(svg('left_top', left_workplane().center(-left_plate_x-extra_base, y-extra_base), top_plate_depth, [3, 4, 5], False))
+        .cut(svg('left_top', left_workplane().center(-left_plate_x-extra_base, y-extra_base), top_plate_depth, [3, 4, 5], invert=False, fillet=keycap_fillet))
 
 
 def center():
@@ -199,13 +204,14 @@ def debox(x, y, z):
         .transformed(offset=(x, y, z)) \
         .box(50, 50, 50)
 
-def svg(svg_file, workplane, extrude, shapes=None, invert=True):
+def svg(svg_file, workplane, extrude_length, shapes=None, invert=True, fillet=None):
     """
     extrude shapes in the svg file on the workplane
     :param svg_file: file name of svg file
     :param workplane: workplane to add svg to
-    :param extrude: amount to extrude by
+    :param extrude_length: amount to extrude by
     :param shapes: list of shapes in the svg file to extrude (null extrudes all)
+    :param invert: invert (y * -1) the svg?
     :return: workplane
     """
     paths, attributes, svg_attributes = svg2paths2(f'{SVG_PATH}{svg_file}.svg')
@@ -215,11 +221,42 @@ def svg(svg_file, workplane, extrude, shapes=None, invert=True):
 
     for idx, poly in enumerate(polys):
         if shapes is None or idx in shapes:
-            zeroed = map(lambda point: (point[0] - min_x, point[1] - max_y), poly)
-            workplane = workplane.moveTo(*zeroed[0]).polyline(zeroed[1:]).close().extrude(extrude)
+            zeroed_poly = map(lambda point: (point[0] - min_x, point[1] - max_y), poly)
+            if fillet:
+                filleted_poly = fillet_shape(zeroed_poly, fillet)
+            else:
+                filleted_poly = zeroed_poly
+            workplane = workplane.moveTo(*filleted_poly[0]).polyline(filleted_poly[1:]).close().extrude(extrude_length)
     return workplane
 
-body = center() \
+
+def fillet_shape(poly, radius, convex = True):
+    """
+    fillet a polygon
+    :param poly: list of point tuples describing the polygon
+    :param radius: radius to fillet by
+    :param convex: if true fillet the convex corners, if false fillet the concave corners
+    :return: list of point representing the filleted polygon
+    """
+    scaled_radius = radius * 2 ** 31
+
+    pco = pyclipper.PyclipperOffset()
+    pco.ArcTolerance = arc_tolerance
+
+    # shrink
+    pco.AddPath(pyclipper.scale_to_clipper(poly), pyclipper.JT_ROUND, pyclipper.ET_CLOSEDPOLYGON)
+    expanded = pco.Execute(-scaled_radius if convex else scaled_radius)
+
+    # expand
+    pco.Clear()
+    pco.AddPath(expanded[0], pyclipper.JT_ROUND, pyclipper.ET_CLOSEDPOLYGON)
+    result = pyclipper.scale_from_clipper(pco.Execute(scaled_radius if convex else -scaled_radius))
+
+    return map(lambda point: (point[0], point[1]), result[0])
+
+
+def body():
+    return center() \
     .union(right()) \
     .union(left()) \
     .union(back()) \
@@ -229,4 +266,12 @@ body = center() \
 
 #     .edges().fillet(fillet_r) \
 
-show_object(body)
+def test():
+    return svg('right_top', cq.Workplane("XY"), extrude, [4])
+
+
+def test2():
+    return svg('right_top', cq.Workplane("XY").transformed(offset=(100,0,0)), extrude, [4], fillet=3)
+
+
+show_object(body())
