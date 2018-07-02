@@ -100,9 +100,11 @@ def center():
     right = wp.plane.toLocalCoords(right_gap_bottom())
     left = wp.plane.toLocalCoords(left_gap_bottom())
 
+    arc_point = (-(y+wrist) + right.y) / 2
+
     return wp \
         .lineTo(right.x, right.y) \
-        .lineTo(left.x, left.y) \
+        .threePointArc((0, arc_point), (left.x, left.y)) \
         .close() \
         .sweep(depth_path)
 
