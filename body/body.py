@@ -3,14 +3,12 @@
 import cadquery as cq
 import numpy as np
 import math
-import quaternion as quat
-from svgpathtools import svg2paths2, Line
+from svgpathtools import svg2paths2
 import logging as log
 import sys
 import itertools
 import pyclipper
 
-# import pydevd
 log.basicConfig(stream=sys.stderr, level=log.DEBUG)
 
 top_plate_depth = 9.0
@@ -53,6 +51,15 @@ arc_tolerance = 100000000
 depth_path = cq.Workplane("XZ").lineTo(0, extrude)
 
 # global 0,0,0 is the pivot point where the halves meet on the bottom
+
+# TODO
+# remove back rounded corners
+# bottom plate cutout
+# USB connector
+# power switch
+# buttons (bluetooth, battery capacity)
+# battery capacity
+
 
 def right():
     big_corner_x = right_x-big_corner+(big_corner*math.sin(math.radians(45)))
@@ -257,23 +264,18 @@ def fillet_shape(poly, radius, convex = True):
     return map(lambda point: (point[0], point[1]), result[0])
 
 
-def body():
+def solid_body():
     return center() \
     .union(right()) \
     .union(left()) \
     .union(back()) \
     .cut(chop()) \
-    .cut(svg('right_top', right_workplane().transformed(offset=(0,0,-top_plate_depth)).center(extra_base, -extra_base), -extrude, [0])) \
-    .cut(svg('left_top', left_workplane().transformed(offset=(0,0,top_plate_depth)).center(-left_plate_x-extra_base, y-extra_base), extrude, [0]))
-
-#     .edges().fillet(fillet_r) \
-
-def test():
-    return svg('right_top', cq.Workplane("XY"), extrude, [4])
 
 
-def test2():
-    return svg('right_top', cq.Workplane("XY").transformed(offset=(100,0,0)), extrude, [4], fillet=3)
+def body():
+    return solid_body() \
+        .cut(svg('right_top', right_workplane().transformed(offset=(0,0,-top_plate_depth)).center(extra_base, -extra_base), -extrude, [0])) \
+        .cut(svg('left_top', left_workplane().transformed(offset=(0,0,top_plate_depth)).center(-left_plate_x-extra_base, y-extra_base), extrude, [0]))
 
 
 show_object(body())
