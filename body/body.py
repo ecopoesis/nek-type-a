@@ -35,7 +35,6 @@ wrist = 62
 
 # radii
 fillet_r = 10
-small_corner = 10
 big_corner = 90
 keycap_fillet = 3
 
@@ -53,7 +52,6 @@ depth_path = cq.Workplane("XZ").lineTo(0, extrude)
 # global 0,0,0 is the pivot point where the halves meet on the bottom
 
 # TODO
-# remove back rounded corners
 # bottom plate cutout
 # USB connector
 # power switch
@@ -64,8 +62,6 @@ depth_path = cq.Workplane("XZ").lineTo(0, extrude)
 def right():
     big_corner_x = right_x-big_corner+(big_corner*math.sin(math.radians(45)))
     big_corner_y = -y-wrist+big_corner-(big_corner*math.cos(math.radians(45)))
-    small_corner_x = right_x-small_corner+(small_corner*math.sin(math.radians(45)))
-    small_corner_y = -small_corner+(small_corner*math.cos(math.radians(45)))
 
     wp = cq.Workplane("XY") \
         .transformed(rotate=cq.Vector(0, tent, split/2)) \
@@ -74,8 +70,7 @@ def right():
     return wp.lineTo(0, -(y+wrist)) \
         .lineTo(right_x-big_corner, -(y+wrist)) \
         .threePointArc((big_corner_x, big_corner_y), (right_x, -y-wrist+big_corner)) \
-        .lineTo(right_x, -small_corner) \
-        .threePointArc((small_corner_x, small_corner_y), (right_x-small_corner, 0)) \
+        .lineTo(right_x, 0) \
         .close() \
         .sweep(depth_path) \
         .cut(svg('right_top', right_workplane().center(extra_base, -extra_base), -top_plate_depth, [3, 4, 5, 6, 7, 8], fillet=keycap_fillet))
@@ -84,8 +79,6 @@ def right():
 def left():
     big_corner_x = -left_x+big_corner-(big_corner*math.sin(math.radians(45)))
     big_corner_y = -y-wrist+big_corner-(big_corner*math.cos(math.radians(45)))
-    small_corner_x = -left_x+small_corner-(small_corner*math.sin(math.radians(45)))
-    small_corner_y = -small_corner+(small_corner*math.cos(math.radians(45)))
 
     return cq.Workplane("XY") \
         .transformed(rotate=cq.Vector(0, -tent, -split/2)) \
@@ -93,8 +86,7 @@ def left():
         .lineTo(0, -(y+wrist)) \
         .lineTo(-left_x+big_corner, -(y+wrist)) \
         .threePointArc((big_corner_x, big_corner_y), (-left_x, -y-wrist+big_corner)) \
-        .lineTo(-left_x, -small_corner) \
-        .threePointArc((small_corner_x, small_corner_y), (-left_x+small_corner, 0)) \
+        .lineTo(-left_x, 0) \
         .close() \
         .sweep(depth_path) \
         .cut(svg('left_top', left_workplane().center(-left_plate_x-extra_base, y-extra_base), top_plate_depth, [3, 4, 5], invert=False, fillet=keycap_fillet))
@@ -134,14 +126,14 @@ def right_back_corner():
     return cq.Workplane("XY") \
         .transformed(rotate=cq.Vector(0, tent, split/2)) \
         .transformed(rotate=cq.Vector(-slope, 0, 0)) \
-        .plane.toWorldCoords((right_x-small_corner, 0))
+        .plane.toWorldCoords((right_x, 0))
 
 
 def left_back_corner():
     return cq.Workplane("XY") \
         .transformed(rotate=cq.Vector(0, -tent, -split/2)) \
         .transformed(rotate=cq.Vector(-slope, 0, 0)) \
-        .plane.toWorldCoords((-left_x+small_corner, 0))
+        .plane.toWorldCoords((-left_x, 0))
 
 
 def build_plane(p1, p2, p3, origin, z_rot=0):
