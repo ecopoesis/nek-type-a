@@ -12,6 +12,7 @@ import pyclipper
 log.basicConfig(stream=sys.stderr, level=log.DEBUG)
 
 top_plate_depth = 9.0
+min_depth = 15
 
 # angles
 tent = 17.5
@@ -38,6 +39,9 @@ fillet_r = 10
 big_corner = 90
 keycap_fillet = 3
 
+# thickness of the bottom plate
+plate_depth = 3
+
 left_x = left_plate_x + (2 * extra_base)
 right_x = right_plate_x + (2 * extra_base)
 y = plate_y + (2 * extra_base)
@@ -63,11 +67,8 @@ def right():
     big_corner_x = right_x-big_corner+(big_corner*math.sin(math.radians(45)))
     big_corner_y = -y-wrist+big_corner-(big_corner*math.cos(math.radians(45)))
 
-    wp = cq.Workplane("XY") \
-        .transformed(rotate=cq.Vector(0, tent, split/2)) \
-        .transformed(rotate=cq.Vector(-slope, 0, 0))
-
-    return wp.lineTo(0, -(y+wrist)) \
+    return transformed_right_wp() \
+        .lineTo(0, -(y+wrist)) \
         .lineTo(right_x-big_corner, -(y+wrist)) \
         .threePointArc((big_corner_x, big_corner_y), (right_x, -y-wrist+big_corner)) \
         .lineTo(right_x, 0) \
@@ -76,13 +77,21 @@ def right():
         .cut(svg('right_top', right_workplane().center(extra_base, -extra_base), -top_plate_depth, [3, 4, 5, 6, 7, 8], fillet=keycap_fillet))
 
 
+def transformed_right_wp():
+    return cq.Workplane("XY") \
+        .transformed(rotate=cq.Vector(0, tent, split / 2)) \
+        .transformed(rotate=cq.Vector(-slope, 0, 0))
+
+def transformed_left_wp():
+    return cq.Workplane("XY") \
+        .transformed(rotate=cq.Vector(0, -tent, -split/2)) \
+        .transformed(rotate=cq.Vector(-slope, 0, 0))
+
 def left():
     big_corner_x = -left_x+big_corner-(big_corner*math.sin(math.radians(45)))
     big_corner_y = -y-wrist+big_corner-(big_corner*math.cos(math.radians(45)))
 
-    return cq.Workplane("XY") \
-        .transformed(rotate=cq.Vector(0, -tent, -split/2)) \
-        .transformed(rotate=cq.Vector(-slope, 0, 0)) \
+    return transformed_left_wp() \
         .lineTo(0, -(y+wrist)) \
         .lineTo(-left_x+big_corner, -(y+wrist)) \
         .threePointArc((big_corner_x, big_corner_y), (-left_x, -y-wrist+big_corner)) \
@@ -109,42 +118,42 @@ def center():
 
 
 def right_gap_bottom():
-    return cq.Workplane("XY") \
-        .transformed(rotate=cq.Vector(0, tent, split/2)) \
-        .transformed(rotate=cq.Vector(-slope, 0, 0)) \
-        .plane.toWorldCoords((0, -(y+wrist)))
+    return transformed_right_wp() \
+        .plane \
+        .toWorldCoords((0, -(y+wrist)))
 
 
 def left_gap_bottom():
-    return cq.Workplane("XY") \
-        .transformed(rotate=cq.Vector(0, -tent, -split/2)) \
-        .transformed(rotate=cq.Vector(-slope, 0, 0)) \
-        .plane.toWorldCoords((0, -(y+wrist)))
+    return transformed_left_wp() \
+        .plane \
+        .toWorldCoords((0, -(y+wrist)))
 
 
 def right_back_corner():
-    return cq.Workplane("XY") \
-        .transformed(rotate=cq.Vector(0, tent, split/2)) \
-        .transformed(rotate=cq.Vector(-slope, 0, 0)) \
-        .plane.toWorldCoords((right_x, 0))
+    return transformed_right_wp() \
+        .plane \
+        .toWorldCoords((right_x, 0))
 
 
 def left_back_corner():
-    return cq.Workplane("XY") \
-        .transformed(rotate=cq.Vector(0, -tent, -split/2)) \
-        .transformed(rotate=cq.Vector(-slope, 0, 0)) \
-        .plane.toWorldCoords((-left_x, 0))
+    return transformed_left_wp() \
+        .plane \
+        .toWorldCoords((-left_x, 0))
 
 
 def build_plane(p1, p2, p3, origin, z_rot=0):
+    normal = plane_normal(p1, p2, p3)
+
+    return cq.Plane(origin, (math.cos(math.radians(z_rot)), math.sin(math.radians(z_rot)), 0), (normal[0], normal[1], normal[2]))
+
+
+def plane_normal(p1, p2, p3):
     # These two vectors are in the plane
     v1 = p3 - p1
     v2 = p2 - p1
 
     # the cross product is a vector normal to the plane
-    normal = np.cross(v1, v2)
-
-    return cq.Plane(origin, (math.cos(math.radians(z_rot)), math.sin(math.radians(z_rot)), 0), (normal[0], normal[1], normal[2]))
+    return np.cross(v1, v2)
 
 
 def right_plane():
@@ -165,12 +174,29 @@ def left_plane():
     return build_plane(p1, p2, p3, (0, 0, extrude), -split/2)
 
 
+def back_plane():
+    """
+    The plane of the back of the case
+    Origin is lower right corner
+    """
+    left_corner = left_back_corner()
+    right_corner = right_back_corner()
+
+    p1 = np.array([left_corner.x, left_corner.y, left_corner.z])
+    p2 = np.array([right_corner.x, right_corner.y, right_corner.z])
+    p3 = np.array([right_corner.x, right_corner.y, right_corner.z + extrude])
+    return build_plane(p1, p2, p3, (right_corner.x, right_corner.y, right_corner.z + extrude - min_depth))
+
 def right_workplane():
     return cq.Workplane(right_plane())
 
 
 def left_workplane():
     return cq.Workplane(left_plane())
+
+
+def back_workplane():
+    return cq.Workplane(back_plane())
 
 
 def back():
@@ -196,14 +222,56 @@ def back():
 def chop():
     depth = right_back_corner().z * -2
     return cq.Workplane("XY") \
-        .transformed(offset=(0, right_gap_bottom().y / 2, right_gap_bottom().z - depth + (depth / 2) + fillet_r)) \
-        .box(800, 400, depth)
+        .transformed(offset=(0, right_gap_bottom().y / 2, right_back_corner().z + extrude - min_depth - depth)) \
+        .box(800, 400, depth, centered=(True, True, False))
 
+
+def bottom_plate():
+    return cq.Workplane("XY") \
+        .transformed(offset=(0,0,-20)) \
+        .moveTo(right_back_corner().x, right_back_corner().y) \
+        .lineTo(left_back_corner().x, left_back_corner().y) \
+        .lineTo(left_gap_bottom().x, left_gap_bottom().y) \
+        .lineTo(right_gap_bottom().x, right_gap_bottom().y) \
+        .close() \
+        .extrude(plate_depth)
+
+def usb():
+    # use usb-c dimensions since microusb-b is smaller
+    panel_depth = 4.5
+    d = 100
+    h = 8.1
+    w = 13
+    r = 1.6
+
+    cavity = back_workplane() \
+        .transformed(offset=(-right_back_corner().x, -h*3, -d - panel_depth)) \
+        .box(30 + (2 * fillet_r), h*3, d, centered=(True, False, False)) \
+        .edges("|Z") \
+        .fillet(fillet_r)
+
+    left_corner = left_back_corner()
+    right_corner = right_back_corner()
+
+    p1 = np.array([left_corner.x, left_corner.y, left_corner.z])
+    p2 = np.array([right_corner.x, right_corner.y, right_corner.z])
+    p3 = np.array([right_corner.x, right_corner.y, right_corner.z + extrude])
+    normal = plane_normal(p1,p2,p3)
+    log.debug(normal)
+
+    port = back_workplane() \
+        .transformed(offset=(-right_back_corner().x, -h*2, -panel_depth)) \
+        .box(w, h, panel_depth, centered=(True, False, False)) \
+        .edges(cq.ParallelDirSelector(cq.Vector(normal[0], normal[1], normal[2]))) \
+        .fillet(r)
+
+    return cavity.union(port)
 
 def debox(x, y, z):
     return cq.Workplane("XY") \
         .transformed(offset=(x, y, z)) \
         .box(50, 50, 50)
+
 
 def svg(svg_file, workplane, extrude_length, shapes=None, invert=True, fillet=None):
     """
@@ -267,7 +335,7 @@ def solid_body():
 def body():
     return solid_body() \
         .cut(svg('right_top', right_workplane().transformed(offset=(0,0,-top_plate_depth)).center(extra_base, -extra_base), -extrude, [0])) \
-        .cut(svg('left_top', left_workplane().transformed(offset=(0,0,top_plate_depth)).center(-left_plate_x-extra_base, y-extra_base), extrude, [0]))
-
+        .cut(svg('left_top', left_workplane().transformed(offset=(0,0,top_plate_depth)).center(-left_plate_x-extra_base, y-extra_base), extrude, [0])) \
+        .cut(usb())
 
 show_object(body())
