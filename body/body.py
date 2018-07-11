@@ -1,13 +1,16 @@
 # -*- coding: future_fstrings -*-
 
+import itertools
+import logging as log
+import math
+import pyclipper
+import sys
+
 import cadquery as cq
 import numpy as np
-import math
 from svgpathtools import svg2paths2
-import logging as log
-import sys
-import itertools
-import pyclipper
+
+from build_data.coord_plane import CoordPlane
 
 log.basicConfig(stream=sys.stderr, level=log.DEBUG)
 
@@ -74,7 +77,7 @@ def right():
         .lineTo(right_x, 0) \
         .close() \
         .sweep(depth_path) \
-        .cut(svg('right_top', right_workplane().center(extra_base, -extra_base), -top_plate_depth, [3, 4, 5, 6, 7, 8], fillet=keycap_fillet))
+        .cut(svg('right_top', right_plane().workplane().center(extra_base, -extra_base), -top_plate_depth, [3, 4, 5, 6, 7, 8], fillet=keycap_fillet))
 
 
 def transformed_right_wp():
@@ -159,10 +162,13 @@ def plane_normal(p1, p2, p3):
 def right_plane():
     right_corner = right_back_corner()
     right_gap = right_gap_bottom()
-    p1 = np.array([0, 0, extrude])
-    p2 = np.array([right_corner.x, right_corner.y, right_corner.z+extrude])
-    p3 = np.array([right_gap.x, right_gap.y, right_gap.z+extrude])
-    return build_plane(p1, p2, p3, (0, 0, extrude), split/2)
+    return CoordPlane(
+        (0, 0, extrude),
+        (right_corner.x, right_corner.y, right_corner.z+extrude),
+        (right_gap.x, right_gap.y, right_gap.z+extrude),
+        (0, 0, extrude),
+        split/2
+    )
 
 
 def left_plane():
@@ -186,9 +192,6 @@ def back_plane():
     p2 = np.array([right_corner.x, right_corner.y, right_corner.z])
     p3 = np.array([right_corner.x, right_corner.y, right_corner.z + extrude])
     return build_plane(p1, p2, p3, (right_corner.x, right_corner.y, right_corner.z + extrude - min_depth))
-
-def right_workplane():
-    return cq.Workplane(right_plane())
 
 
 def left_workplane():
@@ -334,7 +337,7 @@ def solid_body():
 
 def body():
     return solid_body() \
-        .cut(svg('right_top', right_workplane().transformed(offset=(0,0,-top_plate_depth)).center(extra_base, -extra_base), -extrude, [0])) \
+        .cut(svg('right_top', right_plane().workplane().transformed(offset=(0,0,-top_plate_depth)).center(extra_base, -extra_base), -extrude, [0])) \
         .cut(svg('left_top', left_workplane().transformed(offset=(0,0,top_plate_depth)).center(-left_plate_x-extra_base, y-extra_base), extrude, [0])) \
         .cut(usb())
 
