@@ -101,7 +101,7 @@ def left():
         .lineTo(-left_x, 0) \
         .close() \
         .sweep(depth_path) \
-        .cut(svg('left_top', left_workplane().center(-left_plate_x-extra_base, y-extra_base), top_plate_depth, [3, 4, 5], invert=False, fillet=keycap_fillet))
+        .cut(svg('left_top', left_plane().workplane().center(-left_plate_x-extra_base, y-extra_base), top_plate_depth, [3, 4, 5], invert=False, fillet=keycap_fillet))
 
 
 def center():
@@ -144,21 +144,6 @@ def left_back_corner():
         .toWorldCoords((-left_x, 0))
 
 
-def build_plane(p1, p2, p3, origin, z_rot=0):
-    normal = plane_normal(p1, p2, p3)
-
-    return cq.Plane(origin, (math.cos(math.radians(z_rot)), math.sin(math.radians(z_rot)), 0), (normal[0], normal[1], normal[2]))
-
-
-def plane_normal(p1, p2, p3):
-    # These two vectors are in the plane
-    v1 = p3 - p1
-    v2 = p2 - p1
-
-    # the cross product is a vector normal to the plane
-    return np.cross(v1, v2)
-
-
 def right_plane():
     right_corner = right_back_corner()
     right_gap = right_gap_bottom()
@@ -174,10 +159,13 @@ def right_plane():
 def left_plane():
     left_corner = left_back_corner()
     left_gap = left_gap_bottom()
-    p1 = np.array([0, 0, extrude])
-    p2 = np.array([left_corner.x, left_corner.y, left_corner.z+extrude])
-    p3 = np.array([left_gap.x, left_gap.y, left_gap.z+extrude])
-    return build_plane(p1, p2, p3, (0, 0, extrude), -split/2)
+    return CoordPlane(
+        (0, 0, extrude),
+        (left_corner.x, left_corner.y, left_corner.z+extrude),
+        (left_gap.x, left_gap.y, left_gap.z+extrude),
+        (0, 0, extrude),
+        -split/2
+    )
 
 
 def back_plane():
@@ -187,19 +175,12 @@ def back_plane():
     """
     left_corner = left_back_corner()
     right_corner = right_back_corner()
-
-    p1 = np.array([left_corner.x, left_corner.y, left_corner.z])
-    p2 = np.array([right_corner.x, right_corner.y, right_corner.z])
-    p3 = np.array([right_corner.x, right_corner.y, right_corner.z + extrude])
-    return build_plane(p1, p2, p3, (right_corner.x, right_corner.y, right_corner.z + extrude - min_depth))
-
-
-def left_workplane():
-    return cq.Workplane(left_plane())
-
-
-def back_workplane():
-    return cq.Workplane(back_plane())
+    return CoordPlane(
+        (left_corner.x, left_corner.y, left_corner.z),
+        (right_corner.x, right_corner.y, right_corner.z),
+        (right_corner.x, right_corner.y, right_corner.z + extrude),
+        (right_corner.x, right_corner.y, right_corner.z + extrude - min_depth)
+    )
 
 
 def back():
@@ -207,15 +188,17 @@ def back():
     left_corner = left_back_corner()
 
     # compute the plane from these vectors
-    p1 = np.array([0, 0, extrude])
-    p2 = np.array([right_corner.x, right_corner.y, right_corner.z+extrude])
-    p3 = np.array([left_corner.x, left_corner.y, left_corner.z+extrude])
-    plane = build_plane(p1, p2, p3, (0, 0, extrude))
+    plane = CoordPlane(
+        (0, 0, extrude),
+        (right_corner.x, right_corner.y, right_corner.z+extrude),
+        (left_corner.x, left_corner.y, left_corner.z+extrude),
+        (0, 0, extrude)
+    )
 
-    right_transformed = plane.toLocalCoords(cq.Vector(right_corner.x, right_corner.y, right_corner.z+extrude))
-    left_transformed = plane.toLocalCoords(cq.Vector(left_corner.x, left_corner.y, left_corner.z+extrude))
+    right_transformed = plane.plane().toLocalCoords(cq.Vector(right_corner.x, right_corner.y, right_corner.z+extrude))
+    left_transformed = plane.plane().toLocalCoords(cq.Vector(left_corner.x, left_corner.y, left_corner.z+extrude))
 
-    return cq.Workplane(plane) \
+    return plane.workplane() \
         .lineTo(right_transformed.x, right_transformed.y) \
         .lineTo(left_transformed.x, left_transformed.y) \
         .close() \
@@ -239,6 +222,7 @@ def bottom_plate():
         .close() \
         .extrude(plate_depth)
 
+
 def usb():
     # use usb-c dimensions since microusb-b is smaller
     panel_depth = 4.5
@@ -247,28 +231,20 @@ def usb():
     w = 13
     r = 1.6
 
-    cavity = back_workplane() \
+    cavity = back_plane().workplane() \
         .transformed(offset=(-right_back_corner().x, -h*3, -d - panel_depth)) \
         .box(30 + (2 * fillet_r), h*3, d, centered=(True, False, False)) \
         .edges("|Z") \
         .fillet(fillet_r)
 
-    left_corner = left_back_corner()
-    right_corner = right_back_corner()
-
-    p1 = np.array([left_corner.x, left_corner.y, left_corner.z])
-    p2 = np.array([right_corner.x, right_corner.y, right_corner.z])
-    p3 = np.array([right_corner.x, right_corner.y, right_corner.z + extrude])
-    normal = plane_normal(p1,p2,p3)
-    log.debug(normal)
-
-    port = back_workplane() \
+    port = back_plane().workplane() \
         .transformed(offset=(-right_back_corner().x, -h*2, -panel_depth)) \
         .box(w, h, panel_depth, centered=(True, False, False)) \
-        .edges(cq.ParallelDirSelector(cq.Vector(normal[0], normal[1], normal[2]))) \
+        .edges(cq.ParallelDirSelector(back_plane().normal_vector())) \
         .fillet(r)
 
     return cavity.union(port)
+
 
 def debox(x, y, z):
     return cq.Workplane("XY") \
@@ -338,7 +314,7 @@ def solid_body():
 def body():
     return solid_body() \
         .cut(svg('right_top', right_plane().workplane().transformed(offset=(0,0,-top_plate_depth)).center(extra_base, -extra_base), -extrude, [0])) \
-        .cut(svg('left_top', left_workplane().transformed(offset=(0,0,top_plate_depth)).center(-left_plate_x-extra_base, y-extra_base), extrude, [0])) \
+        .cut(svg('left_top', left_plane().workplane().transformed(offset=(0,0,top_plate_depth)).center(-left_plate_x-extra_base, y-extra_base), extrude, [0])) \
         .cut(usb())
 
 show_object(body())

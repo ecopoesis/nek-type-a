@@ -20,6 +20,10 @@ class CoordPlane(object):
         # the cross product is a vector normal to the plane
         return np.cross(v1, v2)
 
+    def normal_vector(self):
+        normal = self.normal()
+        return cq.Vector(normal[0], normal[1], normal[2])
+
     def plane(self):
         normal = self.normal()
         return cq.Plane(self.origin, (math.cos(math.radians(self.z_rot)), math.sin(math.radians(self.z_rot)), 0), (normal[0], normal[1], normal[2]))
