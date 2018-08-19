@@ -167,6 +167,12 @@
 <wire x1="131" y1="-119" x2="131" y2="-3" width="0" layer="20"/>
 <wire x1="131" y1="-3" x2="-2" y2="-3" width="0" layer="20"/>
 <wire x1="-2" y1="-3" x2="-2" y2="-119" width="0" layer="20"/>
+<text x="0" y="-25" size="1.778" layer="25" font="vector" ratio="12">NEK Type A Left
+©2018 Mike Roberts
+Revision 001</text>
+<text x="24" y="-25" size="1.778" layer="26" font="vector" ratio="12" rot="MR0">NEK Type A Left
+©2018 Mike Roberts
+Revision 001</text>
 </plain>
 <libraries>
 <library name="Keyboard">
@@ -1211,6 +1217,10 @@ Note, that not all DRC settings must be set by the manufacturer. Several can be 
 </board>
 </drawing>
 <compatibility>
+<note version="6.3" minversion="6.2.2" severity="warning">
+Since Version 6.2.2 text objects can contain more than one line,
+which will not be processed correctly with this version.
+</note>
 <note version="8.2" severity="warning">
 Since Version 8.2, EAGLE supports online libraries. The ids
 of those online libraries will not be understood (or retained)
