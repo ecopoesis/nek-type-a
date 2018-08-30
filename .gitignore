@@ -54,3 +54,5 @@ fabric.properties
 
 # docker build timestamp
 .docker-build
+
+**/*.log
