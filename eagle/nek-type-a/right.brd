@@ -1117,7 +1117,7 @@ Note, that not all DRC settings must be set by the manufacturer. Several can be 
 <element name="DCOMMAND" library="Controller" package="DO-35" value="1N4148" x="57.72" y="-109.53" rot="R270"/>
 <element name="DCONTROL" library="Controller" package="DO-35" value="1N4148" x="110.11" y="-109.53" rot="R270"/>
 <element name="DDASH" library="Controller" package="DO-35" value="1N4148" x="86.3" y="-33.33" rot="R270"/>
-<element name="DDELETE" library="Controller" package="DO-35" value="1N4148" x="133.92" y="-33.33" rot="R270"/>
+<element name="DDELETE" library="Controller" package="DO-35" value="1N4148" x="161.92" y="-33.33" rot="R270"/>
 <element name="DDOWN" library="Controller" package="DO-35" value="1N4148" x="186.31" y="-100.01" rot="R270"/>
 <element name="DELETE" library="Keyboard" package="MX-2U" value="KEYSWITCH-PLAIN-MX-2U" x="142.87" y="-33.33" rot="R180"/>
 <element name="DEND" library="Controller" package="DO-35" value="1N4148" x="186.31" y="-52.38" rot="R270"/>
@@ -1153,11 +1153,11 @@ Note, that not all DRC settings must be set by the manufacturer. Several can be 
 <element name="DPGUP" library="Controller" package="DO-35" value="1N4148" x="205.36" y="-33.33" rot="R270"/>
 <element name="DQUOTE" library="Controller" package="DO-35" value="1N4148" x="100.58" y="-71.43" rot="R270"/>
 <element name="DRBRACKET" library="Controller" package="DO-35" value="1N4148" x="114.87" y="-52.38" rot="R270"/>
-<element name="DRETURN" library="Controller" package="DO-35" value="1N4148" x="131.54" y="-71.43" rot="R270"/>
+<element name="DRETURN" library="Controller" package="DO-35" value="1N4148" x="121.54" y="-71.43" rot="R270"/>
 <element name="DRIGHT" library="Controller" package="DO-35" value="1N4148" x="205.36" y="-100.01" rot="R270"/>
 <element name="DSEMIC" library="Controller" package="DO-35" value="1N4148" x="81.53" y="-71.43" rot="R270"/>
-<element name="DSHIFT" library="Controller" package="DO-35" value="1N4148" x="122.01" y="-90.48" rot="R270"/>
-<element name="DSPACE" library="Controller" package="DO-35" value="1N4148" x="17.24" y="-109.53" rot="R270"/>
+<element name="DSHIFT" library="Controller" package="DO-35" value="1N4148" x="151.01" y="-90.48" rot="R270"/>
+<element name="DSPACE" library="Controller" package="DO-35" value="1N4148" x="47.24" y="-109.53" rot="R270"/>
 <element name="DU" library="Controller" package="DO-35" value="1N4148" x="19.62" y="-52.38" rot="R270"/>
 <element name="DUP" library="Controller" package="DO-35" value="1N4148" x="186.31" y="-80.96" rot="R270"/>
 <element name="DVOLDOWN" library="Controller" package="DO-35" value="1N4148" x="186.31" y="-9.52" rot="R270"/>
@@ -1295,17 +1295,17 @@ Note, that not all DRC settings must be set by the manufacturer. Several can be 
 <wire x1="86.5" y1="-28.5" x2="105" y2="-28.5" width="0.254" layer="16"/>
 <wire x1="105" y1="-28.5" x2="105.35" y2="-28.51" width="0.254" layer="16"/>
 <wire x1="86.5" y1="-28.5" x2="86.3" y2="-28.51" width="0.254" layer="16"/>
-<wire x1="105.5" y1="-28.5" x2="133.5" y2="-28.5" width="0.254" layer="16"/>
-<wire x1="133.5" y1="-28.5" x2="133.92" y2="-28.51" width="0.254" layer="16"/>
+<wire x1="105.5" y1="-28.5" x2="161.5" y2="-28.5" width="0.254" layer="16"/>
+<wire x1="161.5" y1="-28.5" x2="161.92" y2="-28.51" width="0.254" layer="16"/>
 <wire x1="105.5" y1="-28.5" x2="105.35" y2="-28.51" width="0.254" layer="16"/>
 <wire x1="80" y1="-28.5" x2="67.5" y2="-28.5" width="0.254" layer="16"/>
 <wire x1="67.5" y1="-28.5" x2="67.25" y2="-28.51" width="0.254" layer="16"/>
 <wire x1="48" y1="-28.5" x2="29.5" y2="-28.5" width="0.254" layer="16"/>
 <wire x1="29.5" y1="-28.5" x2="29.15" y2="-28.51" width="0.254" layer="16"/>
 <wire x1="48" y1="-28.5" x2="48.2" y2="-28.51" width="0.254" layer="16"/>
-<wire x1="134" y1="-28.5" x2="167" y2="-28.5" width="0.254" layer="16"/>
+<wire x1="162" y1="-28.5" x2="167" y2="-28.5" width="0.254" layer="16"/>
 <wire x1="167" y1="-28.5" x2="167.26" y2="-28.51" width="0.254" layer="16"/>
-<wire x1="134" y1="-28.5" x2="133.92" y2="-28.51" width="0.254" layer="16"/>
+<wire x1="162" y1="-28.5" x2="161.92" y2="-28.51" width="0.254" layer="16"/>
 </signal>
 <signal name="ROW3">
 <contactref element="DY" pad="C"/>
@@ -1390,8 +1390,8 @@ Note, that not all DRC settings must be set by the manufacturer. Several can be 
 <wire x1="82" y1="-66.5" x2="100.5" y2="-66.5" width="0.254" layer="16"/>
 <wire x1="100.5" y1="-66.5" x2="100.58" y2="-66.61" width="0.254" layer="16"/>
 <wire x1="82" y1="-66.5" x2="81.53" y2="-66.61" width="0.254" layer="16"/>
-<wire x1="101" y1="-66.5" x2="131.5" y2="-66.5" width="0.254" layer="16"/>
-<wire x1="131.5" y1="-66.5" x2="131.54" y2="-66.61" width="0.254" layer="16"/>
+<wire x1="101" y1="-66.5" x2="121.5" y2="-66.5" width="0.254" layer="16"/>
+<wire x1="121.5" y1="-66.5" x2="121.54" y2="-66.61" width="0.254" layer="16"/>
 <wire x1="101" y1="-66.5" x2="100.58" y2="-66.61" width="0.254" layer="16"/>
 <wire x1="81.5" y1="-66.5" x2="62.5" y2="-66.5" width="0.254" layer="16"/>
 <wire x1="62.5" y1="-66.5" x2="62.48" y2="-66.61" width="0.254" layer="16"/>
@@ -1425,13 +1425,13 @@ Note, that not all DRC settings must be set by the manufacturer. Several can be 
 <wire x1="67.5" y1="-85.5" x2="86" y2="-85.5" width="0.254" layer="16"/>
 <wire x1="86" y1="-85.5" x2="86.3" y2="-85.66" width="0.254" layer="16"/>
 <wire x1="67.5" y1="-85.5" x2="67.25" y2="-85.66" width="0.254" layer="16"/>
-<wire x1="86.5" y1="-85.5" x2="122" y2="-85.5" width="0.254" layer="16"/>
-<wire x1="122" y1="-85.5" x2="122.01" y2="-85.66" width="0.254" layer="16"/>
+<wire x1="86.5" y1="-85.5" x2="151" y2="-85.5" width="0.254" layer="16"/>
+<wire x1="151" y1="-85.5" x2="151.01" y2="-85.66" width="0.254" layer="16"/>
 <wire x1="86.5" y1="-85.5" x2="86.3" y2="-85.66" width="0.254" layer="16"/>
 <wire x1="177" y1="-85.5" x2="186" y2="-76.5" width="0.254" layer="16"/>
-<wire x1="122.5" y1="-85.5" x2="177" y2="-85.5" width="0.254" layer="16"/>
+<wire x1="151.5" y1="-85.5" x2="177" y2="-85.5" width="0.254" layer="16"/>
 <wire x1="186" y1="-76.5" x2="186.31" y2="-76.14" width="0.254" layer="16"/>
-<wire x1="122.5" y1="-85.5" x2="122.01" y2="-85.66" width="0.254" layer="16"/>
+<wire x1="151.5" y1="-85.5" x2="151.01" y2="-85.66" width="0.254" layer="16"/>
 <wire x1="48" y1="-85.5" x2="29.5" y2="-85.5" width="0.254" layer="16"/>
 <wire x1="29.5" y1="-85.5" x2="29.15" y2="-85.66" width="0.254" layer="16"/>
 <wire x1="48" y1="-85.5" x2="48.2" y2="-85.66" width="0.254" layer="16"/>
@@ -1446,8 +1446,8 @@ Note, that not all DRC settings must be set by the manufacturer. Several can be 
 <contactref element="DDOWN" pad="C"/>
 <contactref element="DRIGHT" pad="C"/>
 <contactref element="RIGHTCON" pad="3"/>
-<wire x1="57.5" y1="-104.5" x2="17.5" y2="-104.5" width="0.254" layer="16"/>
-<wire x1="17.5" y1="-104.5" x2="17.24" y2="-104.71" width="0.254" layer="16"/>
+<wire x1="57.5" y1="-104.5" x2="47.5" y2="-104.5" width="0.254" layer="16"/>
+<wire x1="47.5" y1="-104.5" x2="47.24" y2="-104.71" width="0.254" layer="16"/>
 <wire x1="57.5" y1="-104.5" x2="57.72" y2="-104.71" width="0.254" layer="16"/>
 <wire x1="186" y1="-95" x2="167.5" y2="-95" width="0.254" layer="16"/>
 <wire x1="167.5" y1="-95" x2="167.26" y2="-95.19" width="0.254" layer="16"/>
@@ -1590,8 +1590,9 @@ Note, that not all DRC settings must be set by the manufacturer. Several can be 
 <signal name="N$18">
 <contactref element="DELETE" pad="MX2"/>
 <contactref element="DDELETE" pad="A"/>
-<wire x1="133.92" y1="-38.15" x2="134.18" y2="-38.41" width="0.254" layer="1"/>
-<wire x1="134.18" y1="-38.41" x2="140.33" y2="-38.41" width="0.254" layer="1"/>
+<wire x1="140.5" y1="-38" x2="161.5" y2="-38" width="0.254" layer="16"/>
+<wire x1="161.5" y1="-38" x2="161.92" y2="-38.15" width="0.254" layer="16"/>
+<wire x1="140.5" y1="-38" x2="140.33" y2="-38.41" width="0.254" layer="16"/>
 </signal>
 <signal name="N$19">
 <contactref element="INSERT" pad="MX2"/>
@@ -1716,8 +1717,10 @@ Note, that not all DRC settings must be set by the manufacturer. Several can be 
 <signal name="N$39">
 <contactref element="RETURN" pad="MX2"/>
 <contactref element="DRETURN" pad="A"/>
-<wire x1="131.54" y1="-76.25" x2="131.8" y2="-76.51" width="0.254" layer="1"/>
-<wire x1="131.8" y1="-76.51" x2="137.95" y2="-76.51" width="0.254" layer="1"/>
+<wire x1="121.54" y1="-76.25" x2="121.8" y2="-76.51" width="0.254" layer="1"/>
+<wire x1="121.8" y1="-76.51" x2="122.167015625" y2="-76.142984375" width="0.254" layer="1"/>
+<wire x1="122.167015625" y1="-76.142984375" x2="137.582984375" y2="-76.142984375" width="0.254" layer="1"/>
+<wire x1="137.582984375" y1="-76.142984375" x2="137.95" y2="-76.51" width="0.254" layer="1"/>
 </signal>
 <signal name="N$40">
 <contactref element="N" pad="MX2"/>
@@ -1752,14 +1755,18 @@ Note, that not all DRC settings must be set by the manufacturer. Several can be 
 <signal name="N$45">
 <contactref element="SHIFT" pad="MX2"/>
 <contactref element="DSHIFT" pad="A"/>
-<wire x1="122.01" y1="-95.3" x2="122.27" y2="-95.56" width="0.254" layer="1"/>
-<wire x1="122.27" y1="-95.56" x2="128.42" y2="-95.56" width="0.254" layer="1"/>
+<wire x1="129" y1="-95" x2="151" y2="-95" width="0.254" layer="16"/>
+<wire x1="128.5" y1="-95.5" x2="129" y2="-95" width="0.254" layer="16"/>
+<wire x1="151" y1="-95" x2="151.01" y2="-95.3" width="0.254" layer="16"/>
+<wire x1="128.5" y1="-95.5" x2="128.42" y2="-95.56" width="0.254" layer="16"/>
 </signal>
 <signal name="N$46">
 <contactref element="SPACE" pad="MX2"/>
 <contactref element="DSPACE" pad="A"/>
-<wire x1="17.24" y1="-114.35" x2="17.5" y2="-114.61" width="0.254" layer="1"/>
-<wire x1="17.5" y1="-114.61" x2="23.65" y2="-114.61" width="0.254" layer="1"/>
+<wire x1="47.24" y1="-114.35" x2="46.98" y2="-114.61" width="0.254" layer="1"/>
+<wire x1="46.98" y1="-114.61" x2="46.612984375" y2="-114.242984375" width="0.254" layer="1"/>
+<wire x1="46.612984375" y1="-114.242984375" x2="24.017015625" y2="-114.242984375" width="0.254" layer="1"/>
+<wire x1="24.017015625" y1="-114.242984375" x2="23.65" y2="-114.61" width="0.254" layer="1"/>
 </signal>
 <signal name="N$47">
 <contactref element="COMMAND" pad="MX2"/>

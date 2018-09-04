@@ -3,10 +3,10 @@
 <eagle version="9.1.3">
 <drawing>
 <settings>
-<setting alwaysvectorfont="no"/>
+<setting alwaysvectorfont="yes"/>
 <setting verticaltext="up"/>
 </settings>
-<grid distance="0.1" unitdist="inch" unit="inch" style="lines" multiple="1" display="yes" altdistance="0.01" altunitdist="inch" altunit="inch"/>
+<grid distance="0.1" unitdist="inch" unit="inch" style="lines" multiple="1" display="no" altdistance="0.01" altunitdist="inch" altunit="inch"/>
 <layers>
 <layer number="1" name="Top" color="4" fill="1" visible="no" active="no"/>
 <layer number="2" name="Route2" color="1" fill="3" visible="no" active="no"/>
@@ -10057,7 +10057,7 @@ This library includes the former libraries ribcon.lbr and ribcon4.lbr.&lt;p&gt;
 <part name="DCOMMAND" library="Controller" deviceset="DIODE" device="-DO-35" value="1N4148"/>
 <part name="SPACE" library="Keyboard" deviceset="KEYSWITCH-PLAIN" device="-MX-2U"/>
 <part name="DSPACE" library="Controller" deviceset="DIODE" device="-DO-35" value="1N4148"/>
-<part name="LEFT" library="con-harting" library_urn="urn:adsk.eagle:library:151" deviceset="CON14" device="" package3d_urn="urn:adsk.eagle:package:7117/1" value="LEFT"/>
+<part name="LEFTCON" library="con-harting" library_urn="urn:adsk.eagle:library:151" deviceset="CON14" device="" package3d_urn="urn:adsk.eagle:package:7117/1" value="LEFTCON"/>
 </parts>
 <sheets>
 <sheet>
@@ -10132,7 +10132,7 @@ This library includes the former libraries ribcon.lbr and ribcon4.lbr.&lt;p&gt;
 <instance part="DCOMMAND" gate="D$1" x="69.088" y="-203.708" rot="R90"/>
 <instance part="SPACE" gate="G$1" x="106.934" y="-218.948"/>
 <instance part="DSPACE" gate="D$1" x="109.474" y="-203.708" rot="R90"/>
-<instance part="LEFT" gate="G$1" x="-17.78" y="-35.56" rot="R180"/>
+<instance part="LEFTCON" gate="G$1" x="-17.78" y="-35.56" rot="R180"/>
 </instances>
 <busses>
 </busses>
@@ -10151,7 +10151,7 @@ This library includes the former libraries ribcon.lbr and ribcon4.lbr.&lt;p&gt;
 <pinref part="DF4" gate="D$1" pin="C"/>
 <wire x1="102.362" y1="1.27" x2="121.412" y2="1.27" width="0.1524" layer="91"/>
 <junction x="102.362" y="1.27"/>
-<pinref part="LEFT" gate="G$1" pin="1"/>
+<pinref part="LEFTCON" gate="G$1" pin="1"/>
 <wire x1="-25.4" y1="-27.94" x2="-25.4" y2="0" width="0.1524" layer="91"/>
 <wire x1="-25.4" y1="0" x2="28.702" y2="1.27" width="0.1524" layer="91"/>
 <junction x="28.702" y="1.27"/>
@@ -10180,7 +10180,7 @@ This library includes the former libraries ribcon.lbr and ribcon4.lbr.&lt;p&gt;
 <junction x="107.188" y="-46.228"/>
 <wire x1="11.938" y1="-46.228" x2="-27.94" y2="-53.34" width="0.1524" layer="91"/>
 <junction x="11.938" y="-46.228"/>
-<pinref part="LEFT" gate="G$1" pin="3"/>
+<pinref part="LEFTCON" gate="G$1" pin="3"/>
 <wire x1="-25.4" y1="-30.48" x2="-27.94" y2="-30.48" width="0.1524" layer="91"/>
 <wire x1="-27.94" y1="-30.48" x2="-27.94" y2="-53.34" width="0.1524" layer="91"/>
 <label x="132.08" y="-45.72" size="1.778" layer="91" xref="yes"/>
@@ -10206,7 +10206,7 @@ This library includes the former libraries ribcon.lbr and ribcon4.lbr.&lt;p&gt;
 <wire x1="16.764" y1="-84.328" x2="-30.48" y2="-86.36" width="0.1524" layer="91"/>
 <junction x="16.764" y="-84.328"/>
 <wire x1="-30.48" y1="-86.36" x2="-30.48" y2="-33.02" width="0.1524" layer="91"/>
-<pinref part="LEFT" gate="G$1" pin="5"/>
+<pinref part="LEFTCON" gate="G$1" pin="5"/>
 <wire x1="-25.4" y1="-33.02" x2="-30.48" y2="-33.02" width="0.1524" layer="91"/>
 <label x="127" y="-83.82" size="1.778" layer="91" xref="yes"/>
 </segment>
@@ -10231,7 +10231,7 @@ This library includes the former libraries ribcon.lbr and ribcon4.lbr.&lt;p&gt;
 <wire x1="19.05" y1="-122.428" x2="-33.02" y2="-121.92" width="0.1524" layer="91"/>
 <junction x="19.05" y="-122.428"/>
 <wire x1="-33.02" y1="-35.56" x2="-33.02" y2="-101.6" width="0.1524" layer="91"/>
-<pinref part="LEFT" gate="G$1" pin="7"/>
+<pinref part="LEFTCON" gate="G$1" pin="7"/>
 <wire x1="-25.4" y1="-35.56" x2="-33.02" y2="-35.56" width="0.1524" layer="91"/>
 <wire x1="-33.02" y1="-121.92" x2="-33.02" y2="-101.6" width="0.1524" layer="91"/>
 <label x="129.54" y="-121.92" size="1.778" layer="91" xref="yes"/>
@@ -10254,7 +10254,7 @@ This library includes the former libraries ribcon.lbr and ribcon4.lbr.&lt;p&gt;
 <pinref part="DB" gate="D$1" pin="C"/>
 <wire x1="107.188" y1="-160.528" x2="126.238" y2="-160.528" width="0.1524" layer="91"/>
 <junction x="107.188" y="-160.528"/>
-<pinref part="LEFT" gate="G$1" pin="9"/>
+<pinref part="LEFTCON" gate="G$1" pin="9"/>
 <wire x1="-25.4" y1="-38.1" x2="-35.56" y2="-38.1" width="0.1524" layer="91"/>
 <wire x1="-35.56" y1="-38.1" x2="-35.56" y2="-160.02" width="0.1524" layer="91"/>
 <wire x1="-35.56" y1="-160.02" x2="21.59" y2="-160.528" width="0.1524" layer="91"/>
@@ -10276,7 +10276,7 @@ This library includes the former libraries ribcon.lbr and ribcon4.lbr.&lt;p&gt;
 <wire x1="16.764" y1="-198.628" x2="-38.1" y2="-198.12" width="0.1524" layer="91"/>
 <junction x="16.764" y="-198.628"/>
 <wire x1="-38.1" y1="-198.12" x2="-38.1" y2="-40.64" width="0.1524" layer="91"/>
-<pinref part="LEFT" gate="G$1" pin="11"/>
+<pinref part="LEFTCON" gate="G$1" pin="11"/>
 <wire x1="-38.1" y1="-40.64" x2="-25.4" y2="-40.64" width="0.1524" layer="91"/>
 <label x="116.84" y="-198.12" size="1.778" layer="91" xref="yes"/>
 </segment>
@@ -10499,7 +10499,7 @@ This library includes the former libraries ribcon.lbr and ribcon4.lbr.&lt;p&gt;
 <pinref part="CONTROL" gate="G$1" pin="P0"/>
 <wire x1="8.89" y1="-178.308" x2="4.064" y2="-216.408" width="0.1524" layer="91"/>
 <junction x="8.89" y="-178.308"/>
-<pinref part="LEFT" gate="G$1" pin="2"/>
+<pinref part="LEFTCON" gate="G$1" pin="2"/>
 <wire x1="-10.16" y1="-27.94" x2="-2.54" y2="-27.94" width="0.1524" layer="91"/>
 <wire x1="-2.54" y1="-27.94" x2="-0.762" y2="-64.008" width="0.1524" layer="91"/>
 <junction x="-0.762" y="-64.008"/>
@@ -10517,7 +10517,7 @@ This library includes the former libraries ribcon.lbr and ribcon4.lbr.&lt;p&gt;
 <pinref part="5" gate="G$1" pin="P0"/>
 <wire x1="108.712" y1="-102.108" x2="94.488" y2="-64.008" width="0.1524" layer="91"/>
 <junction x="108.712" y="-102.108"/>
-<pinref part="LEFT" gate="G$1" pin="12"/>
+<pinref part="LEFTCON" gate="G$1" pin="12"/>
 <wire x1="-10.16" y1="-40.64" x2="93.98" y2="-40.64" width="0.1524" layer="91"/>
 <pinref part="F3" gate="G$1" pin="P0"/>
 <wire x1="93.98" y1="-40.64" x2="89.662" y2="-16.51" width="0.1524" layer="91"/>
@@ -10529,7 +10529,7 @@ This library includes the former libraries ribcon.lbr and ribcon4.lbr.&lt;p&gt;
 </net>
 <net name="COL3" class="0">
 <segment>
-<pinref part="LEFT" gate="G$1" pin="6"/>
+<pinref part="LEFTCON" gate="G$1" pin="6"/>
 <wire x1="-10.16" y1="-33.02" x2="35.56" y2="-33.02" width="0.1524" layer="91"/>
 <pinref part="COMMAND" gate="G$1" pin="P0"/>
 <pinref part="X" gate="G$1" pin="P0"/>
@@ -10550,7 +10550,7 @@ This library includes the former libraries ribcon.lbr and ribcon4.lbr.&lt;p&gt;
 </net>
 <net name="COL7" class="0">
 <segment>
-<pinref part="LEFT" gate="G$1" pin="14"/>
+<pinref part="LEFTCON" gate="G$1" pin="14"/>
 <wire x1="-10.16" y1="-43.18" x2="114.3" y2="-43.18" width="0.1524" layer="91"/>
 <pinref part="F4" gate="G$1" pin="P0"/>
 <wire x1="114.3" y1="-43.18" x2="108.712" y2="-16.51" width="0.1524" layer="91"/>
@@ -10562,7 +10562,7 @@ This library includes the former libraries ribcon.lbr and ribcon4.lbr.&lt;p&gt;
 </net>
 <net name="COL2" class="0">
 <segment>
-<pinref part="LEFT" gate="G$1" pin="4"/>
+<pinref part="LEFTCON" gate="G$1" pin="4"/>
 <wire x1="-10.16" y1="-30.48" x2="15.24" y2="-30.48" width="0.1524" layer="91"/>
 <pinref part="OPTION" gate="G$1" pin="P0"/>
 <pinref part="Z" gate="G$1" pin="P0"/>
@@ -10586,7 +10586,7 @@ This library includes the former libraries ribcon.lbr and ribcon4.lbr.&lt;p&gt;
 </net>
 <net name="COL5" class="0">
 <segment>
-<pinref part="LEFT" gate="G$1" pin="10"/>
+<pinref part="LEFTCON" gate="G$1" pin="10"/>
 <wire x1="-10.16" y1="-38.1" x2="73.66" y2="-38.1" width="0.1524" layer="91"/>
 <pinref part="F2" gate="G$1" pin="P0"/>
 <wire x1="73.66" y1="-38.1" x2="70.612" y2="-16.51" width="0.1524" layer="91"/>
@@ -10610,7 +10610,7 @@ This library includes the former libraries ribcon.lbr and ribcon4.lbr.&lt;p&gt;
 </net>
 <net name="COL4" class="0">
 <segment>
-<pinref part="LEFT" gate="G$1" pin="8"/>
+<pinref part="LEFTCON" gate="G$1" pin="8"/>
 <wire x1="-10.16" y1="-35.56" x2="53.34" y2="-35.56" width="0.1524" layer="91"/>
 <pinref part="F1" gate="G$1" pin="P0"/>
 <wire x1="51.562" y1="-16.51" x2="53.34" y2="-35.56" width="0.1524" layer="91"/>
