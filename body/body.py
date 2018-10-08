@@ -176,12 +176,12 @@ def back_plane():
     left_corner = left_back_corner()
     right_corner = right_back_corner()
 
-    p1 = (left_corner.x, left_corner.y, left_corner.z)
-    p2 = (right_corner.x, right_corner.y, right_corner.z)
-    p3 = (right_corner.x, right_corner.y, right_corner.z + extrude)
-    log.debug(angle(np.array([p1[0], p1[1], p1[2]]),
-                    np.array([p2[0], p2[1], p2[2]]),
-                    np.array([p3[0], p3[1], p3[2]])))
+#    p1 = (left_corner.x, left_corner.y, left_corner.z)
+#    p2 = (right_corner.x, right_corner.y, right_corner.z)
+#    p3 = (right_corner.x, right_corner.y, right_corner.z + extrude)
+#    log.debug(angle(np.array([p1[0], p1[1], p1[2]]),
+#                    np.array([p2[0], p2[1], p2[2]]),
+#                    np.array([p3[0], p3[1], p3[2]])))
 
     return CoordPlane(
         (left_corner.x, left_corner.y, left_corner.z),
@@ -268,11 +268,11 @@ def usb():
         .union(screw2)
 
 
-def angle(p1, p2, p3):
-    v1 = p1 - p2
-    v2 = p2 - p3
+#def angle(p1, p2, p3):
+#    v1 = p1 - p2
+#    v2 = p2 - p3
 
-    return np.degrees(np.math.atan2(np.linalg.det([v1, v2]), np.dot(v1, v2)))
+#    return np.degrees(np.math.atan2(np.linalg.det([v1, v2]), np.dot(v1, v2)))
 
 def svg(svg_file, workplane, extrude_length, shapes=None, invert=True, fillet=None):
     """
