@@ -60,10 +60,7 @@ depth_path = cq.Workplane("XZ").lineTo(0, extrude)
 
 # TODO
 # bottom plate cutout
-# USB connector
 # power switch
-# buttons (bluetooth, battery capacity)
-# battery capacity
 
 
 def right():
@@ -176,13 +173,6 @@ def back_plane():
     left_corner = left_back_corner()
     right_corner = right_back_corner()
 
-#    p1 = (left_corner.x, left_corner.y, left_corner.z)
-#    p2 = (right_corner.x, right_corner.y, right_corner.z)
-#    p3 = (right_corner.x, right_corner.y, right_corner.z + extrude)
-#    log.debug(angle(np.array([p1[0], p1[1], p1[2]]),
-#                    np.array([p2[0], p2[1], p2[2]]),
-#                    np.array([p3[0], p3[1], p3[2]])))
-
     return CoordPlane(
         (left_corner.x, left_corner.y, left_corner.z),
         (right_corner.x, right_corner.y, right_corner.z),
@@ -268,11 +258,13 @@ def usb():
         .union(screw2)
 
 
-#def angle(p1, p2, p3):
-#    v1 = p1 - p2
-#    v2 = p2 - p3
+def center_pcb():
+    cavity = back_plane().workplane() \
+        .transformed(offset=(-right_back_corner().x, -75, -225)) \
+        .box(60 + (2 * fillet_r), 200, 175, centered=(True, False, False))
 
-#    return np.degrees(np.math.atan2(np.linalg.det([v1, v2]), np.dot(v1, v2)))
+    return cavity
+
 
 def svg(svg_file, workplane, extrude_length, shapes=None, invert=True, fillet=None):
     """
@@ -337,6 +329,7 @@ def body():
     return solid_body() \
         .cut(svg('right_top', right_plane().workplane().transformed(offset=(0,0,-top_plate_depth)).center(extra_base, -extra_base), -extrude, [0])) \
         .cut(svg('left_top', left_plane().workplane().transformed(offset=(0,0,top_plate_depth)).center(-left_plate_x-extra_base, y-extra_base), extrude, [0])) \
-        .cut(usb())
+        .cut(usb()) \
+        .cut(center_pcb())
 
 show_object(body())
