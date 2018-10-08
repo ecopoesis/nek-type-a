@@ -1495,7 +1495,7 @@ type 0207, grid 10 mm</description>
 <part name="R1" library="Seeed-Resistor" library_urn="urn:adsk.eagle:library:474" deviceset="DIP-RES-4.7K-5%-1/4W(PR-D2.3XL6.5MM)" device="" package3d_urn="urn:adsk.eagle:package:32794/1" value="4.7K"/>
 <part name="R2" library="Seeed-Resistor" library_urn="urn:adsk.eagle:library:474" deviceset="DIP-RES-4.7K-5%-1/4W(PR-D2.3XL6.5MM)" device="" package3d_urn="urn:adsk.eagle:package:32794/1" value="4.7K"/>
 <part name="R3" library="Seeed-Resistor" library_urn="urn:adsk.eagle:library:474" deviceset="DIP-RES-4.7K-5%-1/4W(PR-D2.3XL6.5MM)" device="" package3d_urn="urn:adsk.eagle:package:32794/1" value="4.7K"/>
-<part name="POWER" library="adafruit" deviceset="JST_2PIN" device="-THM" value="SWITCH"/>
+<part name="SWITCH" library="adafruit" deviceset="JST_2PIN" device="-THM" value="SWITCH"/>
 </parts>
 <sheets>
 <sheet>
@@ -1509,7 +1509,7 @@ type 0207, grid 10 mm</description>
 <instance part="R1" gate="G$1" x="48.26" y="48.26"/>
 <instance part="R2" gate="G$1" x="48.26" y="40.64"/>
 <instance part="R3" gate="G$1" x="38.1" y="50.8"/>
-<instance part="POWER" gate="G$1" x="43.18" y="25.4"/>
+<instance part="SWITCH" gate="G$1" x="43.18" y="25.4"/>
 </instances>
 <busses>
 </busses>
@@ -1551,7 +1551,7 @@ type 0207, grid 10 mm</description>
 <wire x1="25.4" y1="27.94" x2="25.4" y2="53.34" width="0.1524" layer="91"/>
 <wire x1="43.18" y1="-25.4" x2="43.18" y2="-33.02" width="0.1524" layer="91"/>
 <wire x1="43.18" y1="-33.02" x2="25.4" y2="-33.02" width="0.1524" layer="91"/>
-<pinref part="POWER" gate="G$1" pin="1"/>
+<pinref part="SWITCH" gate="G$1" pin="1"/>
 <wire x1="40.64" y1="27.94" x2="25.4" y2="27.94" width="0.1524" layer="91"/>
 <junction x="25.4" y="27.94"/>
 </segment>
@@ -1863,7 +1863,7 @@ type 0207, grid 10 mm</description>
 <wire x1="60.96" y1="81.28" x2="60.96" y2="109.22" width="0.1524" layer="91"/>
 </segment>
 </net>
-<net name="N$1" class="0">
+<net name="RESET" class="0">
 <segment>
 <pinref part="IC1" gate="G$1" pin="!RESET"/>
 <wire x1="38.1" y1="55.88" x2="40.64" y2="55.88" width="0.1524" layer="91"/>
@@ -1874,7 +1874,7 @@ type 0207, grid 10 mm</description>
 </net>
 <net name="EN" class="0">
 <segment>
-<pinref part="POWER" gate="G$1" pin="2"/>
+<pinref part="SWITCH" gate="G$1" pin="2"/>
 <wire x1="40.64" y1="25.4" x2="40.64" y2="20.32" width="0.1524" layer="91"/>
 <wire x1="40.64" y1="20.32" x2="48.26" y2="20.32" width="0.1524" layer="91"/>
 <pinref part="MS1" gate="G$1" pin="EN"/>
