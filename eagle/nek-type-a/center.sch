@@ -1491,7 +1491,7 @@ type 0207, grid 10 mm</description>
 <part name="MS1" library="adafruit" deviceset="FEATHERWING" device="_NODIM"/>
 <part name="LCON" library="con-harting" library_urn="urn:adsk.eagle:library:151" deviceset="CON14" device="" package3d_urn="urn:adsk.eagle:package:7117/1" value="LCON"/>
 <part name="RCON" library="con-harting" library_urn="urn:adsk.eagle:library:151" deviceset="CON20" device="" package3d_urn="urn:adsk.eagle:package:7115/1" value="RCON"/>
-<part name="IC1" library="adafruit" deviceset="MCP23017" device="SP"/>
+<part name="IC1" library="adafruit" deviceset="MCP23017" device="SP" value="MCP23017E-S/P"/>
 <part name="R1" library="Seeed-Resistor" library_urn="urn:adsk.eagle:library:474" deviceset="DIP-RES-4.7K-5%-1/4W(PR-D2.3XL6.5MM)" device="" package3d_urn="urn:adsk.eagle:package:32794/1" value="4.7K"/>
 <part name="R2" library="Seeed-Resistor" library_urn="urn:adsk.eagle:library:474" deviceset="DIP-RES-4.7K-5%-1/4W(PR-D2.3XL6.5MM)" device="" package3d_urn="urn:adsk.eagle:package:32794/1" value="4.7K"/>
 <part name="R3" library="Seeed-Resistor" library_urn="urn:adsk.eagle:library:474" deviceset="DIP-RES-4.7K-5%-1/4W(PR-D2.3XL6.5MM)" device="" package3d_urn="urn:adsk.eagle:package:32794/1" value="4.7K"/>
