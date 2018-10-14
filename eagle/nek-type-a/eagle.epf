@@ -428,6 +428,7 @@ UsedLibrary="/Users/miker/code/OPL-Eagle/OPL-new/Seeed-Sensor.lbr"
 UsedLibrary="/Users/miker/code/OPL-Eagle/OPL-new/Seeed-Switch.lbr"
 UsedLibrary="/Users/miker/code/OPL-Eagle/OPL-new/Seeed-Transistor.lbr"
 UsedLibrary="/Users/miker/code/Adafruit-Eagle-Library/adafruit.lbr"
+UsedLibrary="/Users/miker/Documents/eagle/libraries/Rembrandt Electronics - JST XH Connectors v1-0.lbr"
 
 [Win_1]
 Type="Control Panel"

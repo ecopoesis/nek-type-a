@@ -61,6 +61,9 @@ depth_path = cq.Workplane("XZ").lineTo(0, extrude)
 # TODO
 # bottom plate cutout
 # power switch
+# center mount
+# check left fit
+# check right fit
 
 
 def right():
@@ -105,14 +108,14 @@ def center():
     wp = cq.Workplane("XY") \
         .transformed(rotate=cq.Vector(-slope, 0, 0))
 
-    right = wp.plane.toLocalCoords(right_gap_bottom())
-    left = wp.plane.toLocalCoords(left_gap_bottom())
+    right_gap_bottom_local = wp.plane.toLocalCoords(right_gap_bottom())
+    left_gap_bottom_local = wp.plane.toLocalCoords(left_gap_bottom())
 
-    arc_point = (-(y+wrist) + right.y) / 2
+    arc_point = (-(y+wrist) + right_gap_bottom_local.y) / 2
 
     return wp \
-        .lineTo(right.x, right.y) \
-        .threePointArc((0, arc_point), (left.x, left.y)) \
+        .lineTo(right_gap_bottom_local.x, right_gap_bottom_local.y) \
+        .threePointArc((0, arc_point), (left_gap_bottom_local.x, left_gap_bottom_local.y)) \
         .close() \
         .sweep(depth_path)
 
@@ -258,12 +261,26 @@ def usb():
         .union(screw2)
 
 
-def center_pcb():
-    cavity = back_plane().workplane() \
-        .transformed(offset=(-right_back_corner().x, -75, -225)) \
-        .box(60 + (2 * fillet_r), 200, 175, centered=(True, False, False))
+def spine_slice():
+    """
+    flatten the center spine to make room for the center PCB
+    """
+    wp = cq.Workplane("XY") \
+        .transformed(rotate=cq.Vector(-slope, 0, 0))
 
-    return cavity
+    right_gap = wp.plane.toLocalCoords(transformed_right_wp().plane.toWorldCoords((0, -y)))
+    left_gap = wp.plane.toLocalCoords(transformed_left_wp().plane.toWorldCoords((0, -y)))
+
+    x_slop = 1
+    y_slop = 15
+
+    return cq.Workplane("XY") \
+        .moveTo(10, -40)\
+        .lineTo(right_gap.x + x_slop, right_gap.y + y_slop) \
+        .lineTo(left_gap.x - x_slop, left_gap.y + y_slop) \
+        .lineTo(-10, -40) \
+        .close() \
+        .sweep(cq.Workplane("XZ").lineTo(0, 3 * extrude / 4))
 
 
 def svg(svg_file, workplane, extrude_length, shapes=None, invert=True, fillet=None):
@@ -323,13 +340,13 @@ def solid_body():
     .union(left()) \
     .union(back()) \
     .cut(chop()) \
+    .cut(spine_slice())
 
 
 def body():
     return solid_body() \
         .cut(svg('right_top', right_plane().workplane().transformed(offset=(0,0,-top_plate_depth)).center(extra_base, -extra_base), -extrude, [0])) \
         .cut(svg('left_top', left_plane().workplane().transformed(offset=(0,0,top_plate_depth)).center(-left_plate_x-extra_base, y-extra_base), extrude, [0])) \
-        .cut(usb()) \
-        .cut(center_pcb())
+        .cut(usb())
 
 show_object(body())
