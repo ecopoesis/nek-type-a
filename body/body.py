@@ -41,6 +41,7 @@ wrist = 62
 fillet_r = 10
 big_corner = 90
 keycap_fillet = 3
+cavity_fillet = 2
 
 # thickness of the bottom plate
 plate_depth = 3
@@ -236,8 +237,8 @@ def usb():
     cavity = back_plane().workplane() \
         .transformed(offset=(-right_back_corner().x, -h*3, -d - panel_depth)) \
         .box(30 + (2 * fillet_r), h*3, d, centered=(True, False, False)) \
-        .edges("|Z") \
-        .fillet(fillet_r)
+        .edges("|Z or >Z") \
+        .fillet(h/2)
 
     port = back_plane().workplane() \
         .transformed(offset=(-right_back_corner().x, -h*2, -panel_depth)) \
