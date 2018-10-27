@@ -57,12 +57,13 @@ arc_tolerance = 100000000
 
 depth_path = cq.Workplane("XZ").lineTo(0, extrude)
 
+m3_tap_diameter = 2.5
+
 # global 0,0,0 is the pivot point where the halves meet on the bottom
 
 # TODO
 # bottom plate cutout
 # power switch
-# center mount
 # check left fit
 # check right fit
 
@@ -285,6 +286,26 @@ def spine_slice():
         .faces(">Z").edges(">Y") \
         .fillet(fillet_r)
 
+
+def pcb_mount():
+    """
+    drill holes for PCB mount
+    """
+    wp = cq.Workplane("XY") \
+        .transformed(rotate=cq.Vector(-slope, 0, 0))
+
+    right_gap = wp.plane.toLocalCoords(transformed_right_wp().plane.toWorldCoords((0, -y)))
+    offset = right_gap.y + 30
+
+    depth = 10
+
+    return cq.Workplane("XY") \
+        .transformed(offset=(0, 0, 3 * extrude / 4)) \
+        .pushPoints( [ (22.5, offset), (-22.5, offset), (0, 60 + offset) ] ) \
+        .circle(m3_tap_diameter / 2) \
+        .extrude(depth)
+
+
 def svg(svg_file, workplane, extrude_length, shapes=None, invert=True, fillet=None):
     """
     extrude shapes in the svg file on the workplane
@@ -349,6 +370,8 @@ def body():
     return solid_body() \
         .cut(svg('right_top', right_plane().workplane().transformed(offset=(0,0,-top_plate_depth)).center(extra_base, -extra_base), -extrude, [0])) \
         .cut(svg('left_top', left_plane().workplane().transformed(offset=(0,0,top_plate_depth)).center(-left_plate_x-extra_base, y-extra_base), extrude, [0])) \
-        .cut(usb())
+        .cut(usb()) \
+        .cut(pcb_mount())
+
 
 show_object(body())
