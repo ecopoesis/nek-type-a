@@ -66,14 +66,23 @@ panel_depth = 4
 # global 0,0,0 is the pivot point where the halves meet on the bottom
 
 # TODO
-# bottom plate cutout
+# feet
 # check left fit
 # check right fit
 # make plate cutouts 1 mil larger for slop
 
+def right_big_corner():
+    return right_x-big_corner+(big_corner*math.sin(math.radians(45))), \
+           -y-wrist+big_corner-(big_corner*math.cos(math.radians(45)))
+
+
+def left_big_corner():
+    return -left_x+big_corner-(big_corner*math.sin(math.radians(45))), \
+           -y-wrist+big_corner-(big_corner*math.cos(math.radians(45)))
+
+
 def right():
-    big_corner_x = right_x-big_corner+(big_corner*math.sin(math.radians(45)))
-    big_corner_y = -y-wrist+big_corner-(big_corner*math.cos(math.radians(45)))
+    big_corner_x, big_corner_y = right_big_corner()
 
     return transformed_right_wp() \
         .lineTo(0, -(y+wrist)) \
@@ -98,8 +107,7 @@ def transformed_left_wp():
 
 
 def left():
-    big_corner_x = -left_x+big_corner-(big_corner*math.sin(math.radians(45)))
-    big_corner_y = -y-wrist+big_corner-(big_corner*math.cos(math.radians(45)))
+    big_corner_x, big_corner_y = left_big_corner()
 
     return transformed_left_wp() \
         .lineTo(0, -(y+wrist)) \
@@ -184,6 +192,42 @@ def left_back_corner():
         .toWorldCoords((-left_x, 0))
 
 
+def right_big_corner_bottom():
+    return transformed_right_wp() \
+        .plane \
+        .toWorldCoords((right_x-big_corner, -(y+wrist)))
+
+
+def left_big_corner_bottom():
+    return transformed_left_wp() \
+        .plane \
+        .toWorldCoords((-left_x+big_corner, -(y+wrist)))
+
+
+def right_big_corner_top():
+    return transformed_right_wp() \
+        .plane \
+        .toWorldCoords((right_x, -y-wrist+big_corner))
+
+
+def left_big_corner_top():
+    return transformed_left_wp() \
+        .plane \
+        .toWorldCoords((-left_x, -y-wrist+big_corner))
+
+
+def right_big_corner_arc():
+    return transformed_right_wp() \
+        .plane \
+        .toWorldCoords(right_big_corner())
+
+
+def left_big_corner_arc():
+    return transformed_left_wp() \
+        .plane \
+        .toWorldCoords(left_big_corner())
+
+
 def right_plane():
     right_corner = right_back_corner()
     right_gap = right_gap_bottom()
@@ -254,14 +298,21 @@ def chop():
 
 
 def bottom_plate():
+    r = 5
+    gap = 10
+
     return cq.Workplane("XY") \
         .transformed(offset=(0,0,right_back_corner().z + extrude - min_depth)) \
-        .moveTo(right_back_corner().x, right_back_corner().y) \
-        .lineTo(left_back_corner().x, left_back_corner().y) \
-        .lineTo(left_gap_bottom().x, left_gap_bottom().y) \
-        .lineTo(right_gap_bottom().x, right_gap_bottom().y) \
+        .moveTo(right_back_corner().x - gap, right_back_corner().y - panel_depth) \
+        .lineTo(left_back_corner().x + gap, left_back_corner().y - panel_depth) \
+        .lineTo(left_big_corner_top().x + gap, left_big_corner_top().y) \
+        .threePointArc((left_big_corner_arc().x + gap, left_big_corner_arc().y + gap), (left_big_corner_bottom().x + gap, left_big_corner_bottom().y + gap)) \
+        .lineTo(right_big_corner_bottom().x - gap, right_big_corner_bottom().y + gap) \
+        .threePointArc((right_big_corner_arc().x - gap, right_big_corner_arc().y + gap), (right_big_corner_top().x - gap, right_big_corner_top().y + gap)) \
         .close() \
-        .extrude(plate_depth)
+        .extrude(plate_depth) \
+        .edges("|Z") \
+        .fillet(r)
 
 
 def usb():
