@@ -41,7 +41,6 @@ wrist = 62
 fillet_r = 10
 big_corner = 90
 keycap_fillet = 3
-cavity_fillet = 2
 
 # thickness of the bottom plate
 plate_depth = 3
@@ -62,11 +61,12 @@ m5_p8_tap_diameter = 4.2
 
 plate_tap_depth = -top_plate_depth / 2
 
+panel_depth = 4
+
 # global 0,0,0 is the pivot point where the halves meet on the bottom
 
 # TODO
 # bottom plate cutout
-# power switch
 # check left fit
 # check right fit
 
@@ -264,7 +264,6 @@ def bottom_plate():
 
 def usb():
     # use usb-c dimensions since microusb-b is smaller
-    panel_depth = 4
     d = 100
     h = 8.1
     w = 13
@@ -297,6 +296,26 @@ def usb():
         .union(port) \
         .union(screw1) \
         .union(screw2)
+
+
+def power():
+    d = 100
+    x_offset = -420
+    diameter = 19.5
+
+    cavity = back_plane().workplane() \
+        .transformed(offset=(x_offset, -diameter*2, -d - panel_depth)) \
+        .box(30 + (2 * fillet_r), diameter*2, d, centered=(True, False, False)) \
+        .edges("|Z") \
+        .fillet(fillet_r)
+
+    hole = back_plane().workplane() \
+        .transformed(offset=(x_offset, -diameter, -panel_depth)) \
+        .circle(diameter / 2) \
+        .extrude(panel_depth)
+
+    return cavity \
+        .union(hole)
 
 
 def spine_slice():
@@ -415,6 +434,7 @@ def body():
         .cut(spine_slice()) \
         .cut(pcb_mount()) \
         .cut(left_plate_mount()) \
-        .cut(right_plate_mount())
+        .cut(right_plate_mount()) \
+        .cut(power())
 
 show_object(body())
