@@ -57,7 +57,10 @@ arc_tolerance = 100000000
 
 depth_path = cq.Workplane("XZ").lineTo(0, extrude)
 
-m3_tap_diameter = 2.5
+m3_p5_tap_diameter = 2.5
+m5_p8_tap_diameter = 4.2
+
+plate_tap_depth = -top_plate_depth / 2
 
 # global 0,0,0 is the pivot point where the halves meet on the bottom
 
@@ -104,6 +107,39 @@ def left():
         .close() \
         .sweep(depth_path) \
         .cut(svg('left_top', left_plane().workplane().center(-left_plate_x-extra_base, y-extra_base), top_plate_depth, [3, 4, 5], invert=False, fillet=keycap_fillet))
+
+
+def right_plate_mount():
+    return right_plane().workplane() \
+        .center(extra_base, -extra_base) \
+        .transformed(offset=(0, 0, -top_plate_depth)) \
+        .pushPoints( [ find_shape_center('right_top', 1), find_shape_center('right_top', 2), find_shape_center('right_top', 9), find_shape_center('right_top', 10) ] ) \
+        .circle(m5_p8_tap_diameter / 2) \
+        .extrude(-plate_tap_depth)
+
+
+def left_plate_mount():
+    return left_plane().workplane() \
+        .center(-left_plate_x-extra_base, y-extra_base) \
+        .transformed(offset=(0, 0, top_plate_depth)) \
+        .pushPoints( [ find_shape_center('left_top', 1), find_shape_center('left_top', 2), find_shape_center('left_top', 6), find_shape_center('left_top', 7) ] ) \
+        .circle(m5_p8_tap_diameter / 2) \
+        .extrude(plate_tap_depth)
+
+
+def find_shape_center(svg_file, shape, invert=True):
+    polys, svg_min_x, svg_max_y = svg_load(svg_file, invert)
+
+    poly = polys[shape]
+    zeroed_poly = map(lambda point: (point[0] - svg_min_x, point[1] - svg_max_y), poly)
+
+    min_x = reduce(lambda acc, i: min(acc, i[0]), zeroed_poly, sys.maxsize)
+    max_x = reduce(lambda acc, i: max(acc, i[0]), zeroed_poly, -sys.maxsize)
+
+    min_y = reduce(lambda acc, i: min(acc, i[1]), zeroed_poly, sys.maxsize)
+    max_y = reduce(lambda acc, i: max(acc, i[1]), zeroed_poly, -sys.maxsize)
+
+    return (min_x + max_x) / 2, (min_y + max_y) / 2
 
 
 def center():
@@ -302,7 +338,7 @@ def pcb_mount():
     return cq.Workplane("XY") \
         .transformed(offset=(0, 0, 3 * extrude / 4)) \
         .pushPoints( [ (22.5, offset), (-22.5, offset), (0, 60 + offset) ] ) \
-        .circle(m3_tap_diameter / 2) \
+        .circle(m3_p5_tap_diameter / 2) \
         .extrude(depth)
 
 
@@ -316,10 +352,7 @@ def svg(svg_file, workplane, extrude_length, shapes=None, invert=True, fillet=No
     :param invert: invert (y * -1) the svg?
     :return: workplane
     """
-    paths, attributes, svg_attributes = svg2paths2(f'{SVG_PATH}{svg_file}.svg')
-    polys = list(map(lambda path: (list(map(lambda segment: (segment.start.real, (-1 if invert else 1) * segment.start.imag), path))), paths))
-    min_x = reduce(lambda acc, i: min(acc, i[0]), itertools.chain.from_iterable(polys), sys.maxsize)
-    max_y = reduce(lambda acc, i: max(acc, i[1]), itertools.chain.from_iterable(polys), -sys.maxsize)
+    polys, min_x, max_y = svg_load(svg_file, invert)
 
     for idx, poly in enumerate(polys):
         if shapes is None or idx in shapes:
@@ -330,6 +363,15 @@ def svg(svg_file, workplane, extrude_length, shapes=None, invert=True, fillet=No
                 filleted_poly = zeroed_poly
             workplane = workplane.moveTo(*filleted_poly[0]).polyline(filleted_poly[1:]).close().extrude(extrude_length)
     return workplane
+
+
+def svg_load(svg_file, invert=True):
+    paths, attributes, svg_attributes = svg2paths2(f'{SVG_PATH}{svg_file}.svg')
+    polys = list(map(lambda path: (
+        list(map(lambda segment: (segment.start.real, (-1 if invert else 1) * segment.start.imag), path))), paths))
+    min_x = reduce(lambda acc, i: min(acc, i[0]), itertools.chain.from_iterable(polys), sys.maxsize)
+    max_y = reduce(lambda acc, i: max(acc, i[1]), itertools.chain.from_iterable(polys), -sys.maxsize)
+    return polys, min_x, max_y
 
 
 def fillet_shape(poly, radius, convex = True):
@@ -362,8 +404,6 @@ def solid_body():
     .union(right()) \
     .union(left()) \
     .union(back()) \
-    .cut(chop()) \
-    .cut(spine_slice())
 
 
 def body():
@@ -371,7 +411,10 @@ def body():
         .cut(svg('right_top', right_plane().workplane().transformed(offset=(0,0,-top_plate_depth)).center(extra_base, -extra_base), -extrude, [0])) \
         .cut(svg('left_top', left_plane().workplane().transformed(offset=(0,0,top_plate_depth)).center(-left_plate_x-extra_base, y-extra_base), extrude, [0])) \
         .cut(usb()) \
-        .cut(pcb_mount())
-
+        .cut(chop()) \
+        .cut(spine_slice()) \
+        .cut(pcb_mount()) \
+        .cut(left_plate_mount()) \
+        .cut(right_plate_mount())
 
 show_object(body())
