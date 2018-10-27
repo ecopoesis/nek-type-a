@@ -69,7 +69,7 @@ panel_depth = 4
 # bottom plate cutout
 # check left fit
 # check right fit
-
+# make plate cutouts 1 mil larger for slop
 
 def right():
     big_corner_x = right_x-big_corner+(big_corner*math.sin(math.radians(45)))
@@ -90,10 +90,12 @@ def transformed_right_wp():
         .transformed(rotate=cq.Vector(0, tent, split / 2)) \
         .transformed(rotate=cq.Vector(-slope, 0, 0))
 
+
 def transformed_left_wp():
     return cq.Workplane("XY") \
         .transformed(rotate=cq.Vector(0, -tent, -split/2)) \
         .transformed(rotate=cq.Vector(-slope, 0, 0))
+
 
 def left():
     big_corner_x = -left_x+big_corner-(big_corner*math.sin(math.radians(45)))
@@ -253,7 +255,7 @@ def chop():
 
 def bottom_plate():
     return cq.Workplane("XY") \
-        .transformed(offset=(0,0,-20)) \
+        .transformed(offset=(0,0,right_back_corner().z + extrude - min_depth)) \
         .moveTo(right_back_corner().x, right_back_corner().y) \
         .lineTo(left_back_corner().x, left_back_corner().y) \
         .lineTo(left_gap_bottom().x, left_gap_bottom().y) \
@@ -422,8 +424,7 @@ def solid_body():
     return center() \
     .union(right()) \
     .union(left()) \
-    .union(back()) \
-
+    .union(back())
 
 def body():
     return solid_body() \
@@ -435,6 +436,8 @@ def body():
         .cut(pcb_mount()) \
         .cut(left_plate_mount()) \
         .cut(right_plate_mount()) \
-        .cut(power())
+        .cut(power()) \
+        .cut(bottom_plate())
+
 
 show_object(body())
