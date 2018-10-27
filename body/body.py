@@ -237,8 +237,8 @@ def usb():
     cavity = back_plane().workplane() \
         .transformed(offset=(-right_back_corner().x, -h*3, -d - panel_depth)) \
         .box(30 + (2 * fillet_r), h*3, d, centered=(True, False, False)) \
-        .edges("|Z or >Z") \
-        .fillet(h/2)
+        .edges("|Z") \
+        .fillet(fillet_r)
 
     port = back_plane().workplane() \
         .transformed(offset=(-right_back_corner().x, -h*2, -panel_depth)) \
@@ -276,13 +276,14 @@ def spine_slice():
     y_slop = 15
 
     return cq.Workplane("XY") \
-        .moveTo(10, -40)\
+        .moveTo(40, -40)\
         .lineTo(right_gap.x + x_slop, right_gap.y + y_slop) \
         .lineTo(left_gap.x - x_slop, left_gap.y + y_slop) \
-        .lineTo(-10, -40) \
+        .lineTo(-40, -40) \
         .close() \
-        .sweep(cq.Workplane("XZ").lineTo(0, 3 * extrude / 4))
-
+        .sweep(cq.Workplane("XZ").lineTo(0, 3 * extrude / 4)) \
+        .faces(">Z").edges(">Y") \
+        .fillet(fillet_r)
 
 def svg(svg_file, workplane, extrude_length, shapes=None, invert=True, fillet=None):
     """
