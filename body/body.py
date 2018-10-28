@@ -63,10 +63,12 @@ plate_tap_depth = -top_plate_depth / 2
 
 panel_depth = 4
 
+foot_diameter = 38.1
+foot_height = 20.32
+
 # global 0,0,0 is the pivot point where the halves meet on the bottom
 
 # TODO
-# feet
 # check left fit
 # check right fit
 # make plate cutouts 1 mil larger for slop
@@ -315,6 +317,36 @@ def bottom_plate():
         .fillet(r)
 
 
+def feet_points():
+    back_x_offset = 35
+    back_y_offset = 20
+    big_corner_offset = 25
+
+    return [ (left_back_corner().x + back_x_offset, left_back_corner().y - back_y_offset),
+             (right_back_corner().x - back_x_offset, right_back_corner().y - back_y_offset),
+             (left_big_corner_arc().x + big_corner_offset, left_big_corner_arc().y + big_corner_offset),
+             (right_big_corner_arc().x - big_corner_offset, right_big_corner_arc().y + big_corner_offset)]
+
+
+def feet():
+    return cq.Workplane("XY") \
+        .transformed(offset=(0,0,right_back_corner().z + extrude - min_depth)) \
+        .pushPoints(feet_points()) \
+        .circle(foot_diameter / 2) \
+        .extrude(-foot_height) \
+        .cut(feet_taps())
+
+
+def feet_taps():
+    depth = 20
+
+    return cq.Workplane("XY") \
+        .transformed(offset=(0,0,right_back_corner().z + extrude - min_depth + depth)) \
+        .pushPoints(feet_points()) \
+        .circle(m5_p8_tap_diameter / 2) \
+        .extrude(-depth - foot_height)
+
+
 def usb():
     # use usb-c dimensions since microusb-b is smaller
     d = 100
@@ -353,7 +385,7 @@ def usb():
 
 def power():
     d = 100
-    x_offset = -420
+    x_offset = -390
     diameter = 19.5
 
     cavity = back_plane().workplane() \
@@ -488,7 +520,8 @@ def body():
         .cut(left_plate_mount()) \
         .cut(right_plate_mount()) \
         .cut(power()) \
-        .cut(bottom_plate())
+        .cut(bottom_plate()) \
+        .cut(feet_taps()) 
 
 
 show_object(body())
