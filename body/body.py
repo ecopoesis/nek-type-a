@@ -14,7 +14,7 @@ from build_data.coord_plane import CoordPlane
 
 log.basicConfig(stream=sys.stderr, level=log.DEBUG)
 
-top_plate_depth = 9.0
+top_plate_depth = 10.5
 min_depth = 15
 
 # angles
@@ -41,7 +41,7 @@ wrist = 62
 fillet_r = 5
 cavity_fillet_r = 10
 big_corner = 90
-keycap_fillet = 3
+keycap_fillet = .5
 
 # thickness of the bottom plate
 plate_depth = 3
@@ -60,7 +60,7 @@ depth_path = cq.Workplane("XZ").lineTo(0, extrude)
 m3_p5_tap_diameter = 2.5
 m5_p8_tap_diameter = 4.2
 
-plate_tap_depth = -top_plate_depth / 2
+plate_tap_depth = -7
 
 panel_depth = 4
 
@@ -68,10 +68,6 @@ foot_diameter = 38.1
 foot_height = 20.32
 
 # global 0,0,0 is the pivot point where the halves meet on the bottom
-
-# TODO
-# check left fit
-# check right fit
 
 def right_big_corner():
     return right_x-big_corner+(big_corner*math.sin(math.radians(45))), \
@@ -316,7 +312,7 @@ def bottom_plate():
 
 
 def feet_points():
-    back_x_offset = 35
+    back_x_offset = 40
     back_y_offset = 20
     big_corner_offset = 25
 
@@ -539,8 +535,8 @@ def solid_body():
 
 def body():
     return solid_body() \
-        .cut(svg('right_top', right_plane().workplane().center(extra_base, -extra_base), -top_plate_depth, [3, 4, 5, 6, 7, 8], fillet=keycap_fillet)) \
-        .cut(svg('left_top', left_plane().workplane().center(-left_plate_x-extra_base, y-extra_base), top_plate_depth, [3, 4, 5], invert=False, fillet=keycap_fillet)) \
+        .cut(svg('right_top', right_plane().workplane().center(extra_base, -extra_base), -top_plate_depth, [3, 4, 5, 6, 7, 8], fillet=keycap_fillet, expand=1)) \
+        .cut(svg('left_top', left_plane().workplane().center(-left_plate_x-extra_base, y-extra_base), top_plate_depth, [3, 4, 5], invert=False, fillet=keycap_fillet, expand=1)) \
         .cut(svg('right_top', right_plane().workplane().transformed(offset=(0,0,-top_plate_depth)).center(extra_base, -extra_base), -extrude, [0], expand=1)) \
         .cut(svg('left_top', left_plane().workplane().transformed(offset=(0,0,top_plate_depth)).center(-left_plate_x-extra_base, y-extra_base), extrude, [0], expand=1)) \
         .cut(usb()) \
@@ -551,6 +547,21 @@ def body():
         .cut(power()) \
         .cut(bottom_plate()) \
         .cut(feet_taps())
+
+
+def left_keycap_test():
+    return cq.Workplane("XY") \
+        .lineTo(0, -plate_y) \
+        .lineTo(left_plate_x, -plate_y) \
+        .lineTo(left_plate_x, 0) \
+        .close() \
+        .sweep(cq.Workplane("XZ").lineTo(0, top_plate_depth)) \
+        .cut(svg('left_top', cq.Workplane("XY"), top_plate_depth, [3, 4, 5], invert=False, fillet=keycap_fillet, expand=1)) \
+        .cut(cq.Workplane("XY") \
+             .transformed(offset=(0, 0, top_plate_depth)) \
+             .pushPoints( [ find_shape_center('left_top', 1), find_shape_center('left_top', 2), find_shape_center('left_top', 6), find_shape_center('left_top', 7) ] ) \
+             .circle(m5_p8_tap_diameter / 2) \
+             .extrude(-top_plate_depth))
 
 
 show_object(body())
