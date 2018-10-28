@@ -38,7 +38,8 @@ extra_base = 15
 wrist = 62
 
 # radii
-fillet_r = 10
+fillet_r = 5
+cavity_fillet_r = 10
 big_corner = 90
 keycap_fillet = 3
 
@@ -92,8 +93,7 @@ def right():
         .threePointArc((big_corner_x, big_corner_y), (right_x, -y-wrist+big_corner)) \
         .lineTo(right_x, 0) \
         .close() \
-        .sweep(depth_path) \
-        .cut(svg('right_top', right_plane().workplane().center(extra_base, -extra_base), -top_plate_depth, [3, 4, 5, 6, 7, 8], fillet=keycap_fillet))
+        .sweep(depth_path)
 
 
 def transformed_right_wp():
@@ -117,8 +117,7 @@ def left():
         .threePointArc((big_corner_x, big_corner_y), (-left_x, -y-wrist+big_corner)) \
         .lineTo(-left_x, 0) \
         .close() \
-        .sweep(depth_path) \
-        .cut(svg('left_top', left_plane().workplane().center(-left_plate_x-extra_base, y-extra_base), top_plate_depth, [3, 4, 5], invert=False, fillet=keycap_fillet))
+        .sweep(depth_path)
 
 
 def right_plate_mount():
@@ -357,9 +356,9 @@ def usb():
 
     cavity = back_plane().workplane() \
         .transformed(offset=(-right_back_corner().x, -h*3, -d - panel_depth)) \
-        .box(30 + (2 * fillet_r), h*3, d, centered=(True, False, False)) \
+        .box(30 + (2 * cavity_fillet_r), h * 3, d, centered=(True, False, False)) \
         .edges("|Z") \
-        .fillet(fillet_r)
+        .fillet(cavity_fillet_r)
 
     port = back_plane().workplane() \
         .transformed(offset=(-right_back_corner().x, -h*2, -panel_depth)) \
@@ -390,9 +389,9 @@ def power():
 
     cavity = back_plane().workplane() \
         .transformed(offset=(x_offset, -diameter*2, -d - panel_depth)) \
-        .box(30 + (2 * fillet_r), diameter*2, d, centered=(True, False, False)) \
+        .box(30 + (2 * cavity_fillet_r), diameter * 2, d, centered=(True, False, False)) \
         .edges("|Z") \
-        .fillet(fillet_r)
+        .fillet(cavity_fillet_r)
 
     hole = back_plane().workplane() \
         .transformed(offset=(x_offset, -diameter, -panel_depth)) \
@@ -424,7 +423,7 @@ def spine_slice():
         .close() \
         .sweep(cq.Workplane("XZ").lineTo(0, 3 * extrude / 4)) \
         .faces(">Z").edges(">Y") \
-        .fillet(fillet_r)
+        .fillet(cavity_fillet_r)
 
 
 def pcb_mount():
@@ -505,23 +504,32 @@ def fillet_shape(poly, radius, convex = True):
 
 def solid_body():
     return center() \
-    .union(right()) \
-    .union(left()) \
-    .union(back())
+        .union(right()) \
+        .union(left()) \
+        .union(back()) \
+        .cut(chop()) \
+        .faces(cq.SumSelector(
+            cq.SumSelector(
+                cq.ParallelDirSelector(right_plane().normal_vector()),
+                cq.ParallelDirSelector(left_plane().normal_vector())),
+            cq.DirectionMinMaxSelector(cq.Vector(0,0,1),True))) \
+        .fillet(fillet_r * 2)
+
 
 def body():
     return solid_body() \
+        .cut(svg('right_top', right_plane().workplane().center(extra_base, -extra_base), -top_plate_depth, [3, 4, 5, 6, 7, 8], fillet=keycap_fillet)) \
+        .cut(svg('left_top', left_plane().workplane().center(-left_plate_x-extra_base, y-extra_base), top_plate_depth, [3, 4, 5], invert=False, fillet=keycap_fillet)) \
         .cut(svg('right_top', right_plane().workplane().transformed(offset=(0,0,-top_plate_depth)).center(extra_base, -extra_base), -extrude, [0])) \
         .cut(svg('left_top', left_plane().workplane().transformed(offset=(0,0,top_plate_depth)).center(-left_plate_x-extra_base, y-extra_base), extrude, [0])) \
         .cut(usb()) \
-        .cut(chop()) \
         .cut(spine_slice()) \
         .cut(pcb_mount()) \
         .cut(left_plate_mount()) \
         .cut(right_plate_mount()) \
         .cut(power()) \
         .cut(bottom_plate()) \
-        .cut(feet_taps()) 
+        .cut(feet_taps())
 
 
 show_object(body())
