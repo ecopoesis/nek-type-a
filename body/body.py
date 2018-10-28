@@ -55,7 +55,7 @@ extrude = 150
 
 SVG_PATH = '/opt/cadquery/build_data/'
 
-arc_tolerance = 100000000
+arc_tolerance = 1000000000
 
 depth_path = cq.Workplane("XZ").lineTo(0, extrude)
 
