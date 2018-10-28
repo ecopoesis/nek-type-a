@@ -14,6 +14,8 @@ from build_data.coord_plane import CoordPlane
 
 log.basicConfig(stream=sys.stderr, level=log.DEBUG)
 
+shape = 'body' # body | plate
+
 top_plate_depth = 10.5
 min_depth = 15
 
@@ -59,6 +61,7 @@ depth_path = cq.Workplane("XZ").lineTo(0, extrude)
 
 m3_p5_tap_diameter = 2.5
 m5_p8_tap_diameter = 4.2
+m5_clearance = 5.5
 
 plate_tap_depth = -7
 
@@ -331,13 +334,13 @@ def feet():
         .cut(feet_taps())
 
 
-def feet_taps():
+def feet_taps(size=m5_p8_tap_diameter):
     depth = 20
 
     return cq.Workplane("XY") \
         .transformed(offset=(0,0,right_back_corner().z + extrude - min_depth + depth)) \
         .pushPoints(feet_points()) \
-        .circle(m5_p8_tap_diameter / 2) \
+        .circle(size / 2) \
         .extrude(-depth - foot_height)
 
 
@@ -549,6 +552,11 @@ def body():
         .cut(feet_taps())
 
 
+def plate():
+    return bottom_plate() \
+        .cut(feet_taps(size=m5_clearance))
+
+
 def left_keycap_test():
     return cq.Workplane("XY") \
         .lineTo(0, -plate_y) \
@@ -564,4 +572,4 @@ def left_keycap_test():
              .extrude(-top_plate_depth))
 
 
-show_object(body())
+show_object(globals()[shape]())
