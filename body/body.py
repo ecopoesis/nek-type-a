@@ -72,7 +72,6 @@ foot_height = 20.32
 # TODO
 # check left fit
 # check right fit
-# make plate cutouts 1 mil larger for slop
 
 def right_big_corner():
     return right_x-big_corner+(big_corner*math.sin(math.radians(45))), \
@@ -445,7 +444,7 @@ def pcb_mount():
         .extrude(depth)
 
 
-def svg(svg_file, workplane, extrude_length, shapes=None, invert=True, fillet=None):
+def svg(svg_file, workplane, extrude_length, shapes=None, invert=True, fillet=None, expand=None):
     """
     extrude shapes in the svg file on the workplane
     :param svg_file: file name of svg file
@@ -464,7 +463,13 @@ def svg(svg_file, workplane, extrude_length, shapes=None, invert=True, fillet=No
                 filleted_poly = fillet_shape(zeroed_poly, fillet)
             else:
                 filleted_poly = zeroed_poly
-            workplane = workplane.moveTo(*filleted_poly[0]).polyline(filleted_poly[1:]).close().extrude(extrude_length)
+
+            if expand:
+                expanded_poly = expand_shape(filleted_poly, expand)
+            else:
+                expanded_poly = filleted_poly
+
+            workplane = workplane.moveTo(*expanded_poly[0]).polyline(expanded_poly[1:]).close().extrude(extrude_length)
     return workplane
 
 
@@ -483,7 +488,7 @@ def fillet_shape(poly, radius, convex = True):
     :param poly: list of point tuples describing the polygon
     :param radius: radius to fillet by
     :param convex: if true fillet the convex corners, if false fillet the concave corners
-    :return: list of point representing the filleted polygon
+    :return: list of points representing the filleted polygon
     """
     scaled_radius = radius * 2 ** 31
 
@@ -500,6 +505,22 @@ def fillet_shape(poly, radius, convex = True):
     result = pyclipper.scale_from_clipper(pco.Execute(scaled_radius if convex else -scaled_radius))
 
     return map(lambda point: (point[0], point[1]), result[0])
+
+
+def expand_shape(poly, expansion):
+    """
+    make a polygon larger
+    :param poly: list of point tuples describing the polygon
+    :param expansion: mm to expand (1 will make the entire poly 2mm wider and taller)
+    :return: list of points representing the expanded polygon
+    """
+    scaled_exp = expansion * 2 ** 31
+
+    pco = pyclipper.PyclipperOffset()
+    pco.ArcTolerance = arc_tolerance
+    pco.AddPath(pyclipper.scale_to_clipper(poly), pyclipper.JT_ROUND, pyclipper.ET_CLOSEDPOLYGON)
+    expanded = pyclipper.scale_from_clipper(pco.Execute(scaled_exp))
+    return map(lambda point: (point[0], point[1]), expanded[0])
 
 
 def solid_body():
@@ -520,8 +541,8 @@ def body():
     return solid_body() \
         .cut(svg('right_top', right_plane().workplane().center(extra_base, -extra_base), -top_plate_depth, [3, 4, 5, 6, 7, 8], fillet=keycap_fillet)) \
         .cut(svg('left_top', left_plane().workplane().center(-left_plate_x-extra_base, y-extra_base), top_plate_depth, [3, 4, 5], invert=False, fillet=keycap_fillet)) \
-        .cut(svg('right_top', right_plane().workplane().transformed(offset=(0,0,-top_plate_depth)).center(extra_base, -extra_base), -extrude, [0])) \
-        .cut(svg('left_top', left_plane().workplane().transformed(offset=(0,0,top_plate_depth)).center(-left_plate_x-extra_base, y-extra_base), extrude, [0])) \
+        .cut(svg('right_top', right_plane().workplane().transformed(offset=(0,0,-top_plate_depth)).center(extra_base, -extra_base), -extrude, [0], expand=1)) \
+        .cut(svg('left_top', left_plane().workplane().transformed(offset=(0,0,top_plate_depth)).center(-left_plate_x-extra_base, y-extra_base), extrude, [0], expand=1)) \
         .cut(usb()) \
         .cut(spine_slice()) \
         .cut(pcb_mount()) \
