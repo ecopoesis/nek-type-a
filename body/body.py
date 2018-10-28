@@ -16,7 +16,7 @@ log.basicConfig(stream=sys.stderr, level=log.DEBUG)
 
 shape = 'body' # body | plate
 
-top_plate_depth = 10.5
+top_plate_depth = 10
 min_depth = 15
 
 # angles
