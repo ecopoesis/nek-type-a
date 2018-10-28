@@ -557,6 +557,11 @@ def plate():
         .cut(feet_taps(size=m5_clearance))
 
 
+def solid():
+    return solid_body() \
+        .union(feet())
+
+
 def left_keycap_test():
     return cq.Workplane("XY") \
         .lineTo(0, -plate_y) \

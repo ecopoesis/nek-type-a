@@ -1,4 +1,4 @@
-all: directories target/body.step target/body.stl target/plate.step target/plate.stl
+all: directories target/body.step target/body.stl target/plate.step target/plate.stl target/solid.step target/solid.stl
 
 CQ_SOURCES = body.py .docker-build build_data/*.svg build_data/*.py
 
@@ -7,6 +7,12 @@ target/body.step: $(CQ_SOURCES)
 
 target/body.stl: $(CQ_SOURCES)
 	cat body.py | docker run --name cadquery_step --rm -v $(shell pwd)/build_data:/opt/cadquery/build_data -i ecopoesis/cadquery:latest build --in_spec stdin --format STL --out_spec stdout > target/body.stl
+
+target/solid.step: $(CQ_SOURCES)
+	cat body.py | docker run --name cadquery_stl --rm -v $(shell pwd)/build_data:/opt/cadquery/build_data -i ecopoesis/cadquery:latest build --in_spec stdin --format STEP --out_spec stdout --params '{"shape": "solid"}' > target/solid.step
+
+target/solid.stl: $(CQ_SOURCES)
+	cat body.py | docker run --name cadquery_step --rm -v $(shell pwd)/build_data:/opt/cadquery/build_data -i ecopoesis/cadquery:latest build --in_spec stdin --format STL --out_spec stdout --params '{"shape": "solid"}' > target/solid.stl
 
 target/plate.step: $(CQ_SOURCES)
 	cat body.py | docker run --name cadquery_svg --rm -v $(shell pwd)/build_data:/opt/cadquery/build_data -i ecopoesis/cadquery:latest build --in_spec stdin --format STEP --out_spec stdout --params '{"shape": "plate"}' > target/plate.step
