@@ -1,8 +1,8 @@
 ISO-10303-21;
 HEADER;
 FILE_DESCRIPTION(('FreeCAD Model'),'2;1');
-FILE_NAME('/tmp/tmpQi2gKw','2018-10-28T20:08:36',('FreeCAD'),('FreeCAD')
-  ,'Open CASCADE STEP processor 7.3','FreeCAD','Unknown');
+FILE_NAME('/tmp/tmpSL1BQB','2018-10-29T21:52:14',('FreeCAD'),('FreeCAD')
+  ,'Open CASCADE STEP processor 7.2','FreeCAD','Unknown');
 FILE_SCHEMA(('AUTOMOTIVE_DESIGN { 1 0 10303 214 1 1 1 1 }'));
 ENDSEC;
 DATA;
@@ -14,8 +14,8 @@ DATA;
 #4 = PRODUCT_DEFINITION_SHAPE('','',#5);
 #5 = PRODUCT_DEFINITION('design','',#6,#9);
 #6 = PRODUCT_DEFINITION_FORMATION('','',#7);
-#7 = PRODUCT('Open CASCADE STEP translator 7.3 1',
-  'Open CASCADE STEP translator 7.3 1','',(#8));
+#7 = PRODUCT('Open CASCADE STEP translator 7.2 1',
+  'Open CASCADE STEP translator 7.2 1','',(#8));
 #8 = PRODUCT_CONTEXT('',#2,'mechanical');
 #9 = PRODUCT_DEFINITION_CONTEXT('part definition',#2,'design');
 #10 = ADVANCED_BREP_SHAPE_REPRESENTATION('',(#11,#15),#1169);

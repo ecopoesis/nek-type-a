@@ -11,6 +11,7 @@ import numpy as np
 from svgpathtools import svg2paths2
 
 from build_data.coord_plane import CoordPlane
+from build_data.poly_arc import PolyArc
 
 log.basicConfig(stream=sys.stderr, level=log.DEBUG)
 
@@ -55,7 +56,7 @@ extrude = 150
 
 SVG_PATH = '/opt/cadquery/build_data/'
 
-arc_tolerance = 1000000000
+arc_tolerance = 1000000000000
 
 depth_path = cq.Workplane("XZ").lineTo(0, extrude)
 
@@ -457,6 +458,7 @@ def svg(svg_file, workplane, extrude_length, shapes=None, invert=True, fillet=No
 
     for idx, poly in enumerate(polys):
         if shapes is None or idx in shapes:
+            log.info(f'Processing {svg_file}, shape: {idx}')
             zeroed_poly = map(lambda point: (point[0] - min_x, point[1] - max_y), poly)
             if fillet:
                 filleted_poly = fillet_shape(zeroed_poly, fillet)
@@ -468,7 +470,15 @@ def svg(svg_file, workplane, extrude_length, shapes=None, invert=True, fillet=No
             else:
                 expanded_poly = filleted_poly
 
-            workplane = workplane.moveTo(*expanded_poly[0]).polyline(expanded_poly[1:]).close().extrude(extrude_length)
+            poly_arc = PolyArc(0.001, *expanded_poly)
+            for idx, arc in enumerate(poly_arc.arcs):
+                log.info(arc)
+                if idx == 0:
+                    workplane = workplane.moveTo(arc.a[0], arc.a[1])
+                else:
+                    workplane =  workplane.lineTo(arc.a[0], arc.a[1])
+                workplane =  workplane.threePointArc((arc.b[0], arc.b[1]), (arc.c[0], arc.c[1]))
+            workplane = workplane.close().extrude(extrude_length)
     return workplane
 
 
