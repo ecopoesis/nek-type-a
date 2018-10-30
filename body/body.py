@@ -21,9 +21,9 @@ top_plate_depth = 10
 min_depth = 15
 
 # angles
-tent = 17.5
+tent = 12.5
 split = 25
-slope = 7.5
+slope = 5
 
 # size
 # from http://builder.swillkb.com/
@@ -387,8 +387,8 @@ def power():
     diameter = 19.5
 
     cavity = back_plane().workplane() \
-        .transformed(offset=(x_offset, -diameter*2, -d - panel_depth)) \
-        .box(30 + (2 * cavity_fillet_r), diameter * 2, d, centered=(True, False, False)) \
+        .transformed(offset=(x_offset, -diameter*1.5, -d - panel_depth)) \
+        .box(30 + (2 * cavity_fillet_r), diameter * 1.5, d, centered=(True, False, False)) \
         .edges("|Z") \
         .fillet(cavity_fillet_r)
 
