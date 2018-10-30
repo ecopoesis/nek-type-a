@@ -2,9 +2,7 @@
 
 from __future__ import print_function
 import sys
-
-def eprint(*args, **kwargs):
-    print(*args, file=sys.stderr, **kwargs)
+import logging as log
 
 class PolyArc(object):
 
@@ -18,9 +16,9 @@ class PolyArc(object):
         segment = []
         start_with_line = False
         for idx, p in enumerate(points):
-            eprint(p)
+            log.info(p)
             prev = points[idx-1]
-            if  (self.compare(prev[0], p[0]) or self.compare(prev[1], p[1])):
+            if self.compare(prev[0], p[0]) or self.compare(prev[1], p[1]):
                 # we've detected a line, so save the segment and move on
                 if len(segment) > 0:
                     self.segments.append(segment)
@@ -38,10 +36,14 @@ class PolyArc(object):
 
         # convert the segments into three point arcs
         self.arcs = []
+        log.info('segments:')
         for s in self.segments:
+            log.info(s)
             # remove kinks
-            if (len(s) >= 3):
+            if len(s) >= 3:
                 self.arcs.append(Arc(s[0], s[len(s)/2], s[-1]))
+            if len(s) == 1:
+                self.arcs.append(Line(s[0]))
 
 
     def compare(self, a, b):
@@ -60,3 +62,15 @@ class Arc(object):
 
     def __repr__(self):
         return f'Arc{{{self.a},{self.b},{self.c}}}'
+
+
+class Line(object):
+
+    def __init__(self, a):
+        self.a = a
+
+    def __str__(self):
+        return f'Line{{{self.a}}}'
+
+    def __repr__(self):
+        return f'Line{{{self.a}}}'

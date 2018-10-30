@@ -11,7 +11,7 @@ import numpy as np
 from svgpathtools import svg2paths2
 
 from build_data.coord_plane import CoordPlane
-from build_data.poly_arc import PolyArc
+from build_data.poly_arc import PolyArc, Arc, Line
 
 log.basicConfig(stream=sys.stderr, level=log.DEBUG)
 
@@ -471,13 +471,15 @@ def svg(svg_file, workplane, extrude_length, shapes=None, invert=True, fillet=No
                 expanded_poly = filleted_poly
 
             poly_arc = PolyArc(0.001, *expanded_poly)
-            for idx, arc in enumerate(poly_arc.arcs):
-                log.info(arc)
+            for idx, segment in enumerate(poly_arc.arcs):
+                log.info(segment)
                 if idx == 0:
-                    workplane = workplane.moveTo(arc.a[0], arc.a[1])
+                    workplane = workplane.moveTo(segment.a[0], segment.a[1])
                 else:
-                    workplane =  workplane.lineTo(arc.a[0], arc.a[1])
-                workplane =  workplane.threePointArc((arc.b[0], arc.b[1]), (arc.c[0], arc.c[1]))
+                    workplane =  workplane.lineTo(segment.a[0], segment.a[1])
+
+                if type(segment) is Arc:
+                    workplane =  workplane.threePointArc((segment.b[0], segment.b[1]), (segment.c[0], segment.c[1]))
             workplane = workplane.close().extrude(extrude_length)
     return workplane
 
@@ -573,16 +575,23 @@ def solid():
 
 
 def left_keycap_test():
-    return cq.Workplane("XY") \
-        .lineTo(0, -plate_y) \
-        .lineTo(left_plate_x, -plate_y) \
-        .lineTo(left_plate_x, 0) \
-        .close() \
+    return svg('left_top', cq.Workplane("XY"), top_plate_depth, [0], invert=False, expand=1) \
         .sweep(cq.Workplane("XZ").lineTo(0, top_plate_depth)) \
         .cut(svg('left_top', cq.Workplane("XY"), top_plate_depth, [3, 4, 5], invert=False, fillet=keycap_fillet, expand=1)) \
         .cut(cq.Workplane("XY") \
              .transformed(offset=(0, 0, top_plate_depth)) \
              .pushPoints( [ find_shape_center('left_top', 1), find_shape_center('left_top', 2), find_shape_center('left_top', 6), find_shape_center('left_top', 7) ] ) \
+             .circle(m5_p8_tap_diameter / 2) \
+             .extrude(-top_plate_depth))
+
+
+def right_keycap_test():
+    return svg('right_top', cq.Workplane("XY"), top_plate_depth, [0], invert=False, expand=1) \
+        .sweep(cq.Workplane("XZ").lineTo(0, top_plate_depth)) \
+        .cut(svg('right_top', cq.Workplane("XY"), top_plate_depth, [3, 4, 5, 6, 7, 8], invert=False, fillet=keycap_fillet, expand=1)) \
+        .cut(cq.Workplane("XY") \
+             .transformed(offset=(0, 0, top_plate_depth)) \
+             .pushPoints( [ find_shape_center('right_top', 1), find_shape_center('right_top', 2), find_shape_center('right_top', 9), find_shape_center('right_top', 10) ] ) \
              .circle(m5_p8_tap_diameter / 2) \
              .extrude(-top_plate_depth))
 
