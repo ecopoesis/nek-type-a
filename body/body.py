@@ -21,7 +21,7 @@ top_plate_depth = 10
 min_depth = 15
 
 # angles
-tent = 12.5
+tent = 7.5
 split = 25
 slope = 5
 
@@ -52,7 +52,7 @@ plate_depth = 3
 left_x = left_plate_x + (2 * extra_base)
 right_x = right_plate_x + (2 * extra_base)
 y = plate_y + (2 * extra_base)
-extrude = 150
+extrude = 100
 
 SVG_PATH = '/opt/cadquery/build_data/'
 
@@ -352,6 +352,7 @@ def usb():
     w = 13
     r = 1.6
     screw_diameter = 3.4
+    cavity_depth = h*1.5 # todo compute
 
     cavity = back_plane().workplane() \
         .transformed(offset=(-right_back_corner().x, -h*3, -d - panel_depth)) \
@@ -360,18 +361,18 @@ def usb():
         .fillet(cavity_fillet_r)
 
     port = back_plane().workplane() \
-        .transformed(offset=(-right_back_corner().x, -h*2, -panel_depth)) \
+        .transformed(offset=(-right_back_corner().x, -cavity_depth, -panel_depth)) \
         .box(w, h, panel_depth, centered=(True, True, False)) \
         .edges(cq.ParallelDirSelector(back_plane().normal_vector())) \
         .fillet(r)
 
     screw1 = back_plane().workplane() \
-        .transformed(offset=(-right_back_corner().x-10, -h*2, -panel_depth)) \
+        .transformed(offset=(-right_back_corner().x-10, -cavity_depth, -panel_depth)) \
         .circle(screw_diameter / 2) \
         .extrude(panel_depth)
 
     screw2 = back_plane().workplane() \
-        .transformed(offset=(-right_back_corner().x+10, -h*2, -panel_depth)) \
+        .transformed(offset=(-right_back_corner().x+10, -cavity_depth, -panel_depth)) \
         .circle(screw_diameter / 2) \
         .extrude(panel_depth)
 
@@ -383,17 +384,20 @@ def usb():
 
 def power():
     d = 100
-    x_offset = -390
+    # find the back left corner, move past the foot and the box
+    box_width = 30 + (2 * cavity_fillet_r)
+    x_offset = -(-left_back_corner().x + right_back_corner().x) + 40 + (box_width / 2) + 10
     diameter = 19.5
+    cavity_depth = diameter + 5 # todo compute this programtically
 
     cavity = back_plane().workplane() \
-        .transformed(offset=(x_offset, -diameter*1.5, -d - panel_depth)) \
-        .box(30 + (2 * cavity_fillet_r), diameter * 1.5, d, centered=(True, False, False)) \
+        .transformed(offset=(x_offset, -cavity_depth, -d - panel_depth)) \
+        .box(box_width, cavity_depth, d, centered=(True, False, False)) \
         .edges("|Z") \
         .fillet(cavity_fillet_r)
 
     hole = back_plane().workplane() \
-        .transformed(offset=(x_offset, -diameter, -panel_depth)) \
+        .transformed(offset=(x_offset, -cavity_depth / 2, -panel_depth)) \
         .circle(diameter / 2) \
         .extrude(panel_depth)
 
@@ -411,7 +415,7 @@ def spine_slice():
     right_gap = wp.plane.toLocalCoords(transformed_right_wp().plane.toWorldCoords((0, -y)))
     left_gap = wp.plane.toLocalCoords(transformed_left_wp().plane.toWorldCoords((0, -y)))
 
-    x_slop = 1
+    x_slop = 15
     y_slop = 15
 
     return cq.Workplane("XY") \
