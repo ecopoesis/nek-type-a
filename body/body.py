@@ -268,6 +268,38 @@ def back_plane():
     )
 
 
+def unit_vector(vector):
+    """ Returns the unit vector of the vector.  """
+    return vector / np.linalg.norm(vector)
+
+
+def angle(p1, p2, p3):
+     v1 = unit_vector(p1 - p2)
+     v2 = unit_vector(p2 - p3)
+
+     return np.degrees(np.arccos(np.clip(np.dot(v1, v2), -1.0, 1.0)))
+
+
+def back_angle():
+    left_corner = left_back_corner()
+    right_corner = right_back_corner()
+
+    p1 = (left_corner.x, left_corner.y, left_corner.z)
+    p2 = (right_corner.x, right_corner.y, right_corner.z)
+    p3 = (right_corner.x, right_corner.y, right_corner.z + extrude)
+    return angle(
+        np.array([p1[0], p1[1], p1[2]]),
+        np.array([p2[0], p2[1], p2[2]]),
+        np.array([p3[0], p3[1], p3[2]])) - 90
+
+
+def back_plane_height(x):
+    """
+    height of the back plane at x
+    """
+    return (math.tan(math.radians(back_angle())) * x) + min_depth
+
+
 def back():
     right_corner = right_back_corner()
     left_corner = left_back_corner()
@@ -352,27 +384,27 @@ def usb():
     w = 13
     r = 1.6
     screw_diameter = 3.4
-    cavity_depth = h*1.5 # todo compute
+    back_height = back_plane_height(right_back_corner().x)
 
     cavity = back_plane().workplane() \
-        .transformed(offset=(-right_back_corner().x, -h*3, -d - panel_depth)) \
+        .transformed(offset=(-right_back_corner().x, -back_height, -d - panel_depth)) \
         .box(30 + (2 * cavity_fillet_r), h * 3, d, centered=(True, False, False)) \
         .edges("|Z") \
         .fillet(cavity_fillet_r)
 
     port = back_plane().workplane() \
-        .transformed(offset=(-right_back_corner().x, -cavity_depth, -panel_depth)) \
+        .transformed(offset=(-right_back_corner().x, -back_height / 2, -panel_depth)) \
         .box(w, h, panel_depth, centered=(True, True, False)) \
         .edges(cq.ParallelDirSelector(back_plane().normal_vector())) \
         .fillet(r)
 
     screw1 = back_plane().workplane() \
-        .transformed(offset=(-right_back_corner().x-10, -cavity_depth, -panel_depth)) \
+        .transformed(offset=(-right_back_corner().x-10, -back_height / 2, -panel_depth)) \
         .circle(screw_diameter / 2) \
         .extrude(panel_depth)
 
     screw2 = back_plane().workplane() \
-        .transformed(offset=(-right_back_corner().x+10, -cavity_depth, -panel_depth)) \
+        .transformed(offset=(-right_back_corner().x+10, -back_height / 2, -panel_depth)) \
         .circle(screw_diameter / 2) \
         .extrude(panel_depth)
 
@@ -388,7 +420,7 @@ def power():
     box_width = 30 + (2 * cavity_fillet_r)
     x_offset = -(-left_back_corner().x + right_back_corner().x) + 40 + (box_width / 2) + 10
     diameter = 19.5
-    cavity_depth = diameter + 5 # todo compute this programtically
+    cavity_depth = back_plane_height(-x_offset)
 
     cavity = back_plane().workplane() \
         .transformed(offset=(x_offset, -cavity_depth, -d - panel_depth)) \
