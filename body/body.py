@@ -21,9 +21,9 @@ top_plate_depth = 10
 min_depth = 15
 
 # angles
-tent = 7.5
+tent = 10
 split = 25
-slope = 5
+slope = 10
 
 # size
 # from http://builder.swillkb.com/
@@ -52,7 +52,7 @@ plate_depth = 3
 left_x = left_plate_x + (2 * extra_base)
 right_x = right_plate_x + (2 * extra_base)
 y = plate_y + (2 * extra_base)
-extrude = 100
+extrude = 120 # todo figure out how to compute this
 
 SVG_PATH = '/opt/cadquery/build_data/'
 
@@ -440,25 +440,21 @@ def power():
 def spine_slice():
     """
     flatten the center spine to make room for the center PCB
+    provide step down for deep pockets
     """
-    wp = cq.Workplane("XY") \
-        .transformed(rotate=cq.Vector(-slope, 0, 0))
-
-    right_gap = wp.plane.toLocalCoords(transformed_right_wp().plane.toWorldCoords((0, -y)))
-    left_gap = wp.plane.toLocalCoords(transformed_left_wp().plane.toWorldCoords((0, -y)))
-
-    x_slop = 15
-    y_slop = 15
+    gap = 20
+    fillet = 35
 
     return cq.Workplane("XY") \
-        .moveTo(40, -40)\
-        .lineTo(right_gap.x + x_slop, right_gap.y + y_slop) \
-        .lineTo(left_gap.x - x_slop, left_gap.y + y_slop) \
+        .moveTo(40, -40) \
+        .lineTo(right_big_corner_bottom().x - gap, right_big_corner_bottom().y + gap + (fillet * 2)) \
+        .lineTo(right_big_corner_bottom().x - gap, right_big_corner_bottom().y + gap) \
+        .lineTo(left_big_corner_bottom().x + gap, left_big_corner_bottom().y + gap) \
+        .lineTo(left_big_corner_bottom().x + gap, left_big_corner_bottom().y + gap + (fillet * 2)) \
         .lineTo(-40, -40) \
         .close() \
         .sweep(cq.Workplane("XZ").lineTo(0, 3 * extrude / 4)) \
-        .faces(">Z").edges(">Y") \
-        .fillet(cavity_fillet_r)
+        .edges("|Z").fillet(fillet) \
 
 
 def pcb_mount():
