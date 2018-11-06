@@ -388,7 +388,7 @@ def usb():
 
     cavity = back_plane().workplane() \
         .transformed(offset=(-right_back_corner().x, -back_height, -d - panel_depth)) \
-        .box(30 + (2 * cavity_fillet_r), h * 3, d, centered=(True, False, False)) \
+        .box(30 + (2 * cavity_fillet_r), back_height, d, centered=(True, False, False)) \
         .edges("|Z") \
         .fillet(cavity_fillet_r)
 
