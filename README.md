@@ -24,7 +24,7 @@ The keyboard (and repo) is divided into the following parts:
 
 ### Body
 
-<img src="drawings/top-view.jpg" width="700" alt="NEK Type A">
+<img src="drawings/top-view.jpeg" width="700" alt="NEK Type A">
 
 The body has three major components: the aluminum unibody, the left and right steel switch plates and the acrylic access panel. 
 
