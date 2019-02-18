@@ -4,7 +4,7 @@ One of the best keyboards ever made is the [Microsoft Natural Keyboard](https://
 Unfortunately modern versions of the natural keyboard are significantly worse then the original mid 90s versions. 
 The goal of this project is to create a high-quality, open-source replacement for the natural keyboard.
 
-![Powered by QMK](drawings/qmk.svg)
+<img src="drawings/qmk.svg" width="250" alt="Power by QMK">
 
 ## Goals
 
